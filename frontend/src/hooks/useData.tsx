@@ -31,7 +31,7 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [items, setItems] = useState<Item[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
@@ -64,6 +64,15 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 } finally {
                     setIsLoading(false);
                 }
+            } else {
+                // Clear data on logout
+                setItems([]);
+                setLocations([]);
+                setCategories([]);
+                setUsers([]);
+                setBorrowings([]);
+                setStockHistory([]);
+                setIsLoading(false);
             }
         };
         fetchData();
@@ -83,9 +92,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setItems(prev => prev.filter(item => item.id !== itemId));
     };
     const adjustItemStock = async (itemId: string, quantityChange: number, type: StockHistory['type'], reason: string) => {
-        const { updatedItem, newHistory } = await apiClient.post<{updatedItem: Item, newHistory: StockHistory}>(`/items/${itemId}/adjust`, { quantityChange, type, reason });
+        const updatedItem = await apiClient.post<Item>(`/items/${itemId}/adjust`, { quantityChange, type, reason });
         setItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
-        setStockHistory(prev => [newHistory, ...prev]);
+        // Refetch history to get the new record
+        const stockHistoryData = await apiClient.get<StockHistory[]>('/stock-history');
+        setStockHistory(stockHistoryData);
     };
 
     // Locations
@@ -132,20 +143,24 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Borrowings
     const addBorrowing = async (borrowing: Partial<Borrowing>) => {
-        const { newBorrowing, newHistory } = await apiClient.post<{newBorrowing: Borrowing, newHistory: StockHistory}>('/borrowings', borrowing);
+        const newBorrowing = await apiClient.post<Borrowing>('/borrowings', borrowing);
         setBorrowings(prev => [newBorrowing, ...prev]);
-        setStockHistory(prev => [newHistory, ...prev]);
-        // Also refetch items to update stock
+        
+        // Refetch items and history to reflect stock changes
         const itemsData = await apiClient.get<Item[]>('/items');
         setItems(itemsData);
+        const stockHistoryData = await apiClient.get<StockHistory[]>('/stock-history');
+        setStockHistory(stockHistoryData);
     };
     const returnBorrowing = async (borrowingId: string) => {
-        const { updatedBorrowing, newHistory } = await apiClient.put<{updatedBorrowing: Borrowing, newHistory: StockHistory}>(`/borrowings/${borrowingId}/return`, {});
+        const updatedBorrowing = await apiClient.put<Borrowing>(`/borrowings/${borrowingId}/return`, {});
         setBorrowings(prev => prev.map(b => b.id === updatedBorrowing.id ? updatedBorrowing : b));
-        setStockHistory(prev => [newHistory, ...prev]);
-         // Also refetch items to update stock
+
+        // Refetch items and history to reflect stock changes
         const itemsData = await apiClient.get<Item[]>('/items');
         setItems(itemsData);
+        const stockHistoryData = await apiClient.get<StockHistory[]>('/stock-history');
+        setStockHistory(stockHistoryData);
     };
 
     return (

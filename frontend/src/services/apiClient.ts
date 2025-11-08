@@ -1,6 +1,5 @@
-// FIXED: Use environment variable for API base URL to support both local dev and Docker deployment.
 // The /api path will be proxied by Nginx in production (Docker)
-// and by Vite dev server in development.
+// and by Vite dev server during local development.
 const API_BASE_URL = '/api';
 
 const getAuthToken = (): string | null => {

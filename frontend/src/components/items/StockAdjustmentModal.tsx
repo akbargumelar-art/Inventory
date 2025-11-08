@@ -15,8 +15,8 @@ const StockAdjustmentModal: React.FC<StockAdjustmentModalProps> = ({ isOpen, onC
   const [reason, setReason] = useState<StockHistory['type']>('Dijual');
 
   const reasonOptions: { [key in 'increase' | 'decrease']: StockHistory['type'][] } = {
-    increase: ['Penerimaan', 'Koreksi', 'Retur'],
-    decrease: ['Dijual', 'Hilang', 'Diberikan', 'Koreksi', 'Penjualan'],
+    increase: ['Penerimaan', 'Koreksi', 'Retur', 'Dikembalikan'],
+    decrease: ['Dijual', 'Hilang', 'Diberikan', 'Koreksi', 'Penjualan', 'Dipinjamkan'],
   };
   
   const commonInputStyle = "block w-full mt-1 text-sm text-gray-800 bg-white border border-gray-300 rounded-md focus:border-emerald-400 focus:outline-none focus:ring focus:ring-emerald-200 focus:ring-opacity-50";

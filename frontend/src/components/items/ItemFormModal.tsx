@@ -77,35 +77,35 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Nama Barang</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required className={commonInputStyle} />
+                <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Kategori</label>
-                <select name="categoryId" value={formData.categoryId} onChange={handleChange} className={commonInputStyle}>
+                <select name="categoryId" value={formData.categoryId || ''} onChange={handleChange} className={commonInputStyle}>
                   {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Lokasi Default</label>
-                <select name="defaultLocationId" value={formData.defaultLocationId} onChange={handleChange} className={commonInputStyle}>
+                <select name="defaultLocationId" value={formData.defaultLocationId || ''} onChange={handleChange} className={commonInputStyle}>
                   {locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Stok Saat Ini</label>
-                <input type="number" name="stock" value={formData.stock} onChange={handleChange} className={commonInputStyle} />
+                <input type="number" name="stock" value={formData.stock || 0} onChange={handleChange} className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Minimal Stok</label>
-                <input type="number" name="minStock" value={formData.minStock} onChange={handleChange} className={commonInputStyle} />
+                <input type="number" name="minStock" value={formData.minStock || 0} onChange={handleChange} className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Harga Perkiraan</label>
-                <input type="number" name="price" value={formData.price} onChange={handleChange} className={commonInputStyle} />
+                <input type="number" name="price" value={formData.price || 0} onChange={handleChange} className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Satuan</label>
-                <select name="unit" value={formData.unit} onChange={handleChange} className={commonInputStyle}>
+                <select name="unit" value={formData.unit || 'pcs'} onChange={handleChange} className={commonInputStyle}>
                   <option value="pcs">Pcs</option>
                   <option value="kg">Kg</option>
                   <option value="liter">Liter</option>
@@ -114,7 +114,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
               </div>
                <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Status</label>
-                <select name="status" value={formData.status} onChange={handleChange} className={commonInputStyle}>
+                <select name="status" value={formData.status || 'Aktif'} onChange={handleChange} className={commonInputStyle}>
                   <option value="Aktif">Aktif</option>
                   <option value="Baik">Baik</option>
                   <option value="Rusak">Rusak</option>
@@ -123,7 +123,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Deskripsi</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} rows={3} className={commonInputStyle}></textarea>
+                <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={3} className={commonInputStyle}></textarea>
               </div>
                <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Foto/Video</label>

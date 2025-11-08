@@ -27,7 +27,7 @@ const BorrowingsPage: React.FC = () => {
         }
     };
 
-    const handleSave = (borrowing: Omit<Borrowing, 'id' | 'status'>) => {
+    const handleSave = (borrowing: Partial<Borrowing>) => {
         addBorrowing(borrowing);
         toast.success('Data peminjaman baru berhasil ditambahkan.');
         setIsFormOpen(false);

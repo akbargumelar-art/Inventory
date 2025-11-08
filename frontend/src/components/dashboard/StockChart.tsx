@@ -2,9 +2,6 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { StockHistory } from '../../types';
 
-// NOTE: This component requires 'recharts' to be installed.
-// You can install it with: npm install recharts
-
 interface StockChartProps {
     data: StockHistory[];
 }

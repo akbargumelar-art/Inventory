@@ -5,7 +5,7 @@ import { useData } from '../../hooks/useData';
 interface BorrowingFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (borrowing: Omit<Borrowing, 'id' | 'status' | 'actualReturnDate'>) => void;
+  onSave: (borrowing: Partial<Borrowing>) => void;
 }
 
 const BorrowingFormModal: React.FC<BorrowingFormModalProps> = ({ isOpen, onClose, onSave }) => {
@@ -72,7 +72,7 @@ const BorrowingFormModal: React.FC<BorrowingFormModalProps> = ({ isOpen, onClose
             </div>
              <div>
               <label className="block text-sm text-gray-700">Catatan</label>
-              <textarea name="notes" value={formData.notes} onChange={handleChange} rows={2} className={commonInputStyle}></textarea>
+              <textarea name="notes" value={formData.notes || ''} onChange={handleChange} rows={2} className={commonInputStyle}></textarea>
             </div>
           </div>
           <div className="flex items-center justify-end p-6 border-t rounded-b">

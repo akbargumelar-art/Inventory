@@ -20,8 +20,12 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
         return `${user} mengoreksi stok ${itemName} sejumlah ${activity.quantityChange} unit.`;
       case 'Transfer':
         return `${user} mentransfer ${quantity} unit ${itemName} dari ${activity.fromLocation?.name} ke ${activity.toLocation?.name}.`;
+      case 'Dipinjamkan':
+        return `${quantity} unit ${itemName} dipinjamkan.`;
+      case 'Dikembalikan':
+        return `${quantity} unit ${itemName} dikembalikan.`;
       default:
-        return `Aktivitas tidak dikenal untuk ${itemName}.`;
+        return `${user} melakukan: ${activity.type} ${quantity} unit ${itemName}.`;
     }
   };
 
