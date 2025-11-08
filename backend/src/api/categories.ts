@@ -1,5 +1,5 @@
-// Fix: Use require for Express to ensure correct type resolution.
-import express = require('express');
+// Fix: Use ES module import for Express.
+import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth';
 
@@ -7,7 +7,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all categories
-router.get('/', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.get('/', authMiddleware, async (req: Request, res: Response) => {
     try {
         const categories = await prisma.category.findMany({ orderBy: { name: 'asc' }});
         res.json(categories);
@@ -17,7 +18,8 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // POST a new category
-router.post('/', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.post('/', authMiddleware, async (req: Request, res: Response) => {
     const { name, parentId } = req.body;
     try {
         const newCategory = await prisma.category.create({
@@ -30,7 +32,8 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // PUT to update a category
-router.put('/:id', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, parentId } = req.body;
     try {
@@ -45,7 +48,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // DELETE a category
-router.delete('/:id', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         await prisma.category.delete({ where: { id } });

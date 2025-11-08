@@ -1,5 +1,5 @@
-// Fix: Use require for Express to ensure correct type resolution.
-import express = require('express');
+// Fix: Use ES module import for Express.
+import express, { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
@@ -7,7 +7,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all items
-router.get('/', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const items = await prisma.item.findMany({ 
             // include: { media: true },
@@ -20,7 +21,8 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // POST a new item
-router.post('/', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { ...itemData } = req.body;
     // active field is replaced by status
     delete itemData.active;
@@ -45,7 +47,8 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // PUT to update an item
-router.put('/:id', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
      // remove fields that shouldn't be updated directly
@@ -72,7 +75,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // DELETE an item
-router.delete('/:id', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
         // In a real app, you might need to handle related records first
@@ -85,7 +89,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // POST to adjust stock
-router.post('/:id/adjust', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+// Fix: Added types for req and res.
+router.post('/:id/adjust', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;
     const userId = req.user?.userId;

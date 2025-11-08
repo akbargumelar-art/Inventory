@@ -1,5 +1,5 @@
-// Fix: Use require for Express to ensure correct type resolution.
-import express = require('express');
+// Fix: Use ES module import for Express.
+import express, { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
@@ -7,7 +7,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all borrowings
-router.get('/', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const borrowings = await prisma.borrowing.findMany({ orderBy: { borrowDate: 'desc' }});
         res.json(borrowings);
@@ -17,7 +18,8 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // POST a new borrowing
-router.post('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+// Fix: Added type for req.
+router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { itemId, borrowerName, borrowDate, expectedReturnDate, notes } = req.body;
     const userId = req.user?.userId;
 
@@ -34,7 +36,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: express.Response)
             });
 
             // Create borrowing record
-            return tx.borrowing.create({
+            const borrowing = await tx.borrowing.create({
                 data: {
                     itemId,
                     userId,
@@ -44,6 +46,18 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: express.Response)
                     notes,
                 },
             });
+            // Create stock history record
+            await tx.stockHistory.create({
+                data: {
+                    itemId: itemId,
+                    userId: userId,
+                    quantityChange: -1,
+                    type: 'Dipinjamkan',
+                    reason: `Dipinjam oleh ${borrowerName}`,
+                }
+            });
+
+            return borrowing;
         });
         res.status(201).json(newBorrowing);
     } catch (error) {
@@ -53,8 +67,15 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: express.Response)
 });
 
 // PUT to return a borrowing
-router.put('/:id/return', authMiddleware, async (req, res) => {
+// Fix: Added types for req and res.
+router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+    }
+
     try {
         const updatedBorrowing = await prisma.$transaction(async (tx) => {
             const borrowing = await tx.borrowing.findUnique({ where: { id } });
@@ -66,6 +87,17 @@ router.put('/:id/return', authMiddleware, async (req, res) => {
             await tx.item.update({
                 where: { id: borrowing.itemId },
                 data: { stock: { increment: 1 } },
+            });
+
+            // Create stock history record
+            await tx.stockHistory.create({
+                data: {
+                    itemId: borrowing.itemId,
+                    userId,
+                    quantityChange: 1,
+                    type: 'Dikembalikan',
+                    reason: `Dikembalikan oleh ${borrowing.borrowerName}`,
+                }
             });
 
             // Update borrowing status

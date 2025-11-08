@@ -1,5 +1,5 @@
-// Fix: Use require for Express to ensure correct type resolution.
-import express = require('express');
+// Fix: Use ES module import for Express.
+import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -8,7 +8,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+// Fix: Added types for req and res.
+router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -22,16 +23,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // In a real app, you would compare hashed passwords
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
-    // For this demo, we'll use a placeholder check as we don't have password hashing on signup
-    // if (!isPasswordValid) {
-    //   return res.status(401).json({ message: 'Invalid credentials' });
-    // }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
     
-    // For demo purposes, we accept any password for the seeded users.
-    // In a real app, you must implement password hashing.
-
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET as string,

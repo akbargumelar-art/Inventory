@@ -1,13 +1,14 @@
-// Fix: Use require for Express to ensure correct type resolution.
-import express = require('express');
+// Fix: Use ES module import for Express types.
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-// Fix: Redefined AuthRequest as an intersection type to resolve an issue with property inheritance from Express's Request type.
-export type AuthRequest = express.Request & {
+// Fix: Redefined AuthRequest as an interface extending Request to resolve an issue with property inheritance from Express's Request type.
+export interface AuthRequest extends Request {
   user?: { userId: string; role: string };
-};
+}
 
-export const authMiddleware = (req: AuthRequest, res: express.Response, next: express.NextFunction) => {
+// Fix: Added explicit types for middleware arguments.
+export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

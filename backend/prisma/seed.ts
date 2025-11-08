@@ -9,19 +9,32 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Start seeding ...');
 
-  const hashedPassword = await bcrypt.hash('password', 10);
+  const adminPassword = await bcrypt.hash('password', 10);
+  const akbarPassword = await bcrypt.hash('password123', 10);
 
-  // Seed User
-  const admin = await prisma.user.upsert({
+  // Seed Users
+  await prisma.user.upsert({
     where: { email: 'admin@inventory.com' },
-    update: {},
+    update: { password: adminPassword },
     create: {
       email: 'admin@inventory.com',
       name: 'Admin',
-      password: hashedPassword,
+      password: adminPassword,
       role: 'Administrator',
     },
   });
+
+  await prisma.user.upsert({
+    where: { email: 'akbar@inventory.com' },
+    update: { password: akbarPassword },
+    create: {
+      email: 'akbar@inventory.com',
+      name: 'Akbar',
+      password: akbarPassword,
+      role: 'Administrator',
+    },
+  });
+
 
   // Seed Location
   const gudangUtama = await prisma.location.upsert({

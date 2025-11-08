@@ -1,5 +1,5 @@
-// Fix: Changed express import to use require syntax to fix type resolution issues.
-import express = require('express');
+// Fix: Changed express import to use ES module syntax.
+import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './api/auth';
@@ -9,10 +9,11 @@ import categoryRoutes from './api/categories';
 import userRoutes from './api/users';
 import borrowingRoutes from './api/borrowings';
 import profileRoutes from './api/profile';
+import stockHistoryRoutes from './api/stockHistory';
 
 dotenv.config();
 
-const app: express.Express = express();
+const app: Express = express();
 const port = process.env.PORT || 6001;
 
 // Middleware
@@ -27,15 +28,18 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/borrowings', borrowingRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/stock-history', stockHistoryRoutes);
 
 
 // Health Check
-app.get('/', (req: express.Request, res: express.Response) => {
+// Fix: Added Request and Response types to the handler.
+app.get('/', (req: Request, res: Response) => {
   res.send('Inventory Management API is running!');
 });
 
 // Global Error Handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// Fix: Added types for all arguments in the error handler.
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });

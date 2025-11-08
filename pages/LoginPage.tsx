@@ -70,9 +70,6 @@ const LoginPage: React.FC = () => {
                 </button>
               </form>
               {error && <p className="mt-2 text-xs text-red-500 text-center">{error}</p>}
-               <p className="mt-4 text-xs text-center text-gray-500">
-                Gunakan: admin@inventory.com
-               </p>
             </div>
           </div>
         </div>
