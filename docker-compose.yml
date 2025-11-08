@@ -1,19 +1,36 @@
 version: '3.8'
 
 services:
-  backend:
-    build: ./backend
-    container_name: inventory_backend
+  # This service builds and serves the frontend application using Nginx.
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: inventory_nginx
     restart: always
-    env_file: ./.env # Memuat variabel dari file .env di root
     ports:
-      - "6001:6001"
+      - "80:80" # Maps port 80 of the host to port 80 of the container
     depends_on:
-      db:
-        condition: service_healthy # Menunggu database siap
+      - backend
     networks:
       - app-network
 
+  # This service runs the backend API.
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: inventory_backend
+    restart: always
+    env_file: ./.env # Loads environment variables from the .env file
+    # The port is not exposed directly to the host. Access is through the nginx proxy.
+    depends_on:
+      db:
+        condition: service_healthy # Waits for the database to be ready before starting
+    networks:
+      - app-network
+
+  # This service runs the MySQL database.
   db:
     image: mysql:8.0
     container_name: inventory_db
@@ -23,10 +40,11 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpassword
+    # Exposing the DB port is useful for local debugging with a GUI tool like SQLyog.
     ports:
       - "3306:3306"
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/mysql # Persists database data
     networks:
       - app-network
     healthcheck:

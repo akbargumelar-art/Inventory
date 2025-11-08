@@ -1,4 +1,4 @@
-# Sistem Manajemen Inventori - Full Stack
+# Sistem Manajemen Inventori - Full Stack (FIXED & COMPLETED)
 
 Aplikasi web full-stack untuk manajemen inventori barang yang modern, responsif, dan mudah digunakan. Dibangun dengan React (Vite) di frontend, Node.js (Express & Prisma) di backend, dan MySQL sebagai database. Siap untuk dideploy menggunakan Docker.
 
@@ -22,30 +22,33 @@ Aplikasi web full-stack untuk manajemen inventori barang yang modern, responsif,
 - **Autentikasi:** JWT, bcryptjs
 - **Deployment:** Docker, Docker Compose, Nginx
 
-## 📂 Struktur Proyek
+## 📂 Struktur Proyek (FIXED)
 
 ```
 inventori-app/
 ├── backend/
-│   ├── prisma/
-│   ├── src/
-│   └── Dockerfile         # PENTING: Instruksi build backend
-├── src/                   # Kode aplikasi frontend (React)
-├── .env.example           # PENTING: Template konfigurasi
-├── docker-compose.yml     # Orkestrasi container (backend + db)
+│   ├── prisma/             # Skema & seed database
+│   ├── src/                # Kode sumber backend Express
+│   └── Dockerfile          # Instruksi build backend
+├── frontend/
+│   ├── public/             # Aset statis
+│   ├── src/                # Kode sumber frontend React
+│   ├── Dockerfile          # Instruksi build frontend (dengan Nginx)
+│   └── nginx.conf          # Konfigurasi Nginx
+├── .env.example            # Template konfigurasi
+├── docker-compose.yml      # Orkestrasi semua container
 └── README.md
 ```
 
 ---
 
-## 🚀 Menjalankan Aplikasi Secara Lokal (Menggunakan Docker)
+## 🚀 Menjalankan Aplikasi (Menggunakan Docker)
 
-Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produksi.
+Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produksi dan mengelola semua layanan (frontend, backend, database) secara otomatis.
 
 ### Prasyarat
 
 - [Docker](https://www.docker.com/get-started) dan [Docker Compose](https://docs.docker.com/compose/install/) terinstall.
-- [Node.js](https://nodejs.org/) dan npm (untuk membangun frontend).
 
 ### Langkah-langkah
 
@@ -67,11 +70,11 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
       ```bash
       docker-compose up --build -d
       ```
-    - Perintah ini akan membangun dan menjalankan container untuk backend dan database.
+    - Perintah ini akan membangun image Docker untuk frontend dan backend, serta menjalankan semua container. Tunggu beberapa saat hingga proses selesai.
 
 4.  **Setup Database (Hanya saat pertama kali)**
-    - Buka terminal baru, pastikan container sudah berjalan (`docker ps`).
-    - Jalankan migrasi Prisma untuk membuat semua tabel.
+    - Pastikan container sudah berjalan (`docker ps`).
+    - Jalankan migrasi Prisma untuk membuat semua tabel di database.
       ```bash
       docker-compose exec backend npx prisma migrate deploy
       ```
@@ -80,20 +83,17 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
       docker-compose exec backend npx prisma db seed
       ```
 
-5.  **Jalankan Frontend**
-    - Buka terminal baru di direktori root proyek.
-    - Install dependensi dan jalankan server pengembangan Vite.
-      ```bash
-      npm install
-      npm run dev
-      ```
-    - Aplikasi frontend sekarang dapat diakses di `http://localhost:5173`.
-    - Anda bisa login dengan `username: admin`, `password: password`.
+5.  **Akses Aplikasi**
+    - Aplikasi sekarang dapat diakses di browser Anda pada alamat `http://localhost`.
+    - Anda bisa login dengan:
+      - **Username:** `akbar`
+      - **Password:** `password`
 
 ---
 
-## 🌐 Panduan Deploy ke VPS (Ubuntu)
+## ⏹️ Menghentikan Aplikasi
 
-Langkah-langkah ini akan memandu Anda untuk men-deploy aplikasi ini ke server produksi menggunakan Docker, Nginx sebagai *reverse proxy*, dan Certbot untuk SSL.
-
-(Panduan deploy ke VPS tetap sama seperti sebelumnya, pastikan untuk mengikuti langkah membuat file `.env` di direktori root proyek).
+Untuk menghentikan semua container yang berjalan, jalankan perintah berikut dari direktori root proyek:
+```bash
+docker-compose down
+```

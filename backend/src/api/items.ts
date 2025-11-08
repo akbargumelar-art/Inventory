@@ -1,15 +1,15 @@
 // Fix: Use ES module import for Express.
-import express from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
-const router = express.Router();
+const router = Router();
 const prisma = new PrismaClient();
 
 // GET all items
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const items = await prisma.item.findMany({ 
             // include: { media: true },
@@ -24,7 +24,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) 
 // POST a new item
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.post('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { ...itemData } = req.body;
     // active field is replaced by status
     delete itemData.active;
@@ -51,7 +51,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: express.Response)
 // PUT to update an item
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.put('/:id', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
      // remove fields that shouldn't be updated directly
@@ -80,7 +80,7 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: express.Respons
 // DELETE an item
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
         // In a real app, you might need to handle related records first
@@ -95,7 +95,7 @@ router.delete('/:id', authMiddleware, async (req: AuthRequest, res: express.Resp
 // POST to adjust stock
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.post('/:id/adjust', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+router.post('/:id/adjust', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;
     const userId = req.user?.userId;
