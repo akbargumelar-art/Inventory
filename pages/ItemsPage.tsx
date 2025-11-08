@@ -10,6 +10,20 @@ import ConfirmationModal from '../components/common/ConfirmationModal';
 import { PencilIcon, TrashIcon, AdjustmentsIcon } from '../constants/icons';
 import toast from 'react-hot-toast';
 
+const getStatusBadge = (status: Item['status']) => {
+  switch (status) {
+    case 'Aktif':
+    case 'Baik':
+      return 'text-green-700 bg-green-100';
+    case 'Rusak':
+      return 'text-yellow-700 bg-yellow-100';
+    case 'Non-Aktif':
+      return 'text-gray-700 bg-gray-100';
+    default:
+      return 'text-gray-700 bg-gray-100';
+  }
+};
+
 const ItemsPage: React.FC = () => {
   const { items, categories, updateItem, addItem, deleteItem, adjustItemStock } = useData();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -124,6 +138,7 @@ const ItemsPage: React.FC = () => {
                 <th className="px-4 py-3">Barang</th>
                 <th className="px-4 py-3">SKU</th>
                 <th className="px-4 py-3">Stok</th>
+                <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Harga</th>
                 <th className="px-4 py-3">Aksi</th>
               </tr>
@@ -144,6 +159,11 @@ const ItemsPage: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-sm">{item.sku}</td>
                   <td className="px-4 py-3 text-sm">{item.stock} {item.unit}</td>
+                   <td className="px-4 py-3 text-xs">
+                    <span className={`px-2 py-1 font-semibold leading-tight rounded-full ${getStatusBadge(item.status)}`}>
+                      {item.status}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-sm">{formatCurrency(item.price)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center space-x-1 text-sm">

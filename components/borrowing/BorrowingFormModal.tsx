@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Borrowing } from '../../types';
 import { useData } from '../../hooks/useData';
@@ -10,8 +11,9 @@ interface BorrowingFormModalProps {
 
 const BorrowingFormModal: React.FC<BorrowingFormModalProps> = ({ isOpen, onClose, onSave }) => {
   const { items } = useData();
+  const availableItems = items.filter(i => (i.status === 'Aktif' || i.status === 'Baik') && i.stock > 0);
   const [formData, setFormData] = useState({
-    itemId: items.find(i => i.stock > 0)?.id || '',
+    itemId: availableItems[0]?.id || '',
     borrowerName: '',
     borrowDate: new Date().toISOString().split('T')[0],
     expectedReturnDate: '',
@@ -52,7 +54,7 @@ const BorrowingFormModal: React.FC<BorrowingFormModalProps> = ({ isOpen, onClose
               <label className="block text-sm text-gray-700">Barang yang Dipinjam</label>
               <select name="itemId" value={formData.itemId} onChange={handleChange} required className={commonInputStyle}>
                 <option value="">-- Pilih Barang --</option>
-                {items.filter(i => i.stock > 0).map(item => (
+                {availableItems.map(item => (
                   <option key={item.id} value={item.id}>{item.name} (Stok: {item.stock})</option>
                 ))}
               </select>

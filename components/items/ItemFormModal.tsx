@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Item, Media } from '../../types';
 import { useData } from '../../hooks/useData';
@@ -31,21 +32,15 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
         minStock: 10,
         price: 0,
         currency: 'IDR',
-        active: true,
+        status: 'Aktif',
         media: [],
       });
     }
   }, [item, isOpen, categories, locations]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    
-    if (type === 'checkbox') {
-        const { checked } = e.target as HTMLInputElement;
-        setFormData({ ...formData, [name]: checked });
-    } else {
-        setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,6 +113,15 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
                   <option value="meter">Meter</option>
                 </select>
               </div>
+               <div className="md:col-span-2">
+                <label className="block text-sm text-gray-700">Status</label>
+                <select name="status" value={formData.status} onChange={handleChange} className={commonInputStyle}>
+                  <option value="Aktif">Aktif</option>
+                  <option value="Baik">Baik</option>
+                  <option value="Rusak">Rusak</option>
+                  <option value="Non-Aktif">Non-Aktif</option>
+                </select>
+              </div>
               <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Deskripsi</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} rows={3} className={commonInputStyle}></textarea>
@@ -125,12 +129,6 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
                <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Foto/Video</label>
                 <input type="file" multiple onChange={handleMediaChange} accept="image/*,video/*" className="block w-full mt-1 text-sm" />
-              </div>
-              <div className="mt-4 text-sm">
-                <label className="flex items-center text-gray-700">
-                  <input type="checkbox" name="active" checked={formData.active} onChange={handleChange} className="text-emerald-600 form-checkbox focus:border-emerald-400 focus:outline-none focus:shadow-outline-emerald" />
-                  <span className="ml-2">Barang Aktif</span>
-                </label>
               </div>
             </div>
           </div>

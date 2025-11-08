@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = 'http://localhost:6001/api';
 
 const getAuthToken = (): string | null => {
     const authData = sessionStorage.getItem('auth');

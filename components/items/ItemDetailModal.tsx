@@ -4,6 +4,21 @@ import { Item } from '../../types';
 import { useData } from '../../hooks/useData';
 import { formatCurrency, formatDate } from '../../utils/formatter';
 
+const getStatusBadge = (status: Item['status']) => {
+  switch (status) {
+    case 'Aktif':
+    case 'Baik':
+      return 'text-green-700 bg-green-100';
+    case 'Rusak':
+      return 'text-yellow-700 bg-yellow-100';
+    case 'Non-Aktif':
+      return 'text-gray-700 bg-gray-100';
+    default:
+      return 'text-gray-700 bg-gray-100';
+  }
+};
+
+
 interface ItemDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -65,8 +80,8 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ isOpen, onClose, item
 
             <div className="font-semibold text-gray-500">Status</div>
             <div>
-                <span className={`px-2 py-1 text-xs font-semibold leading-tight rounded-full ${item.active ? 'text-green-700 bg-green-100' : 'text-gray-700 bg-gray-100'}`}>
-                    {item.active ? 'Aktif' : 'Non-Aktif'}
+                <span className={`px-2 py-1 text-xs font-semibold leading-tight rounded-full ${getStatusBadge(item.status)}`}>
+                    {item.status}
                 </span>
             </div>
 

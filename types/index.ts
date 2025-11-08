@@ -42,7 +42,7 @@ export interface Item {
   minStock: number;
   price: number;
   currency: 'IDR';
-  active: boolean;
+  status: 'Aktif' | 'Non-Aktif' | 'Baik' | 'Rusak';
   createdAt: string;
 }
 

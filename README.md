@@ -73,7 +73,7 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
       ```env
       DATABASE_URL="mysql://user:password@db:3306/inventory_db"
       JWT_SECRET="your-super-secret-key"
-      PORT=4000
+      PORT=6001
       ```
 
 3.  **Jalankan Aplikasi dengan Docker Compose**
@@ -83,7 +83,7 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
       ```
     - Perintah ini akan:
         - Membangun *image* Docker untuk aplikasi backend.
-        - Menjalankan container untuk **backend** (di port 4000) dan **database MySQL** (di port 3306).
+        - Menjalankan container untuk **backend** (di port 6001) dan **database MySQL** (di port 3306).
         - Membuat database `inventory_db` secara otomatis.
 
 4.  **Setup Database (Hanya saat pertama kali)**
@@ -105,7 +105,7 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
       npm run dev
       ```
     - Aplikasi frontend sekarang dapat diakses di `http://localhost:5173` (atau port lain yang ditampilkan).
-    - Aplikasi backend dapat diakses di `http://localhost:4000`.
+    - Aplikasi backend dapat diakses di `http://localhost:6001`.
 
 ---
 
@@ -198,7 +198,7 @@ Langkah-langkah ini akan memandu Anda untuk men-deploy aplikasi ini ke server pr
         }
 
         location /api/ {
-            proxy_pass http://localhost:4000/;
+            proxy_pass http://localhost:6001/;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -245,7 +245,7 @@ Langkah-langkah ini akan memandu Anda untuk men-deploy aplikasi ini ke server pr
         }
 
         location /api/ {
-            proxy_pass http://localhost:4000/;
+            proxy_pass http://localhost:6001/;
             # ... (konfigurasi proxy_pass lainnya tetap sama) ...
         }
     }

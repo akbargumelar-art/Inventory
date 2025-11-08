@@ -1,9 +1,10 @@
-import { Router } from 'express';
+// Fix: Use require for Express to ensure correct type resolution.
+import express = require('express');
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const router = Router();
+const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/auth/login
