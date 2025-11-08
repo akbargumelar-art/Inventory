@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User } from '../types';
 import { useData } from '../hooks/useData';
@@ -69,6 +68,7 @@ const UsersPage: React.FC = () => {
             <thead>
               <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
                 <th className="px-4 py-3">Nama</th>
+                <th className="px-4 py-3">Username</th>
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Role</th>
                 <th className="px-4 py-3">Aksi</th>
@@ -78,6 +78,7 @@ const UsersPage: React.FC = () => {
               {users.map((user) => (
                 <tr key={user.id} className="text-gray-700">
                   <td className="px-4 py-3 text-sm font-semibold">{user.name}</td>
+                  <td className="px-4 py-3 text-sm">{user.username}</td>
                   <td className="px-4 py-3 text-sm">{user.email}</td>
                   <td className="px-4 py-3 text-sm">{user.role}</td>
                   <td className="px-4 py-3">

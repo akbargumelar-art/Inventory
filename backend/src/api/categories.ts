@@ -1,5 +1,5 @@
 // Fix: Use ES module import for Express.
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth';
 
@@ -8,7 +8,8 @@ const prisma = new PrismaClient();
 
 // GET all categories
 // Fix: Added types for req and res.
-router.get('/', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.get('/', authMiddleware, async (req: express.Request, res: express.Response) => {
     try {
         const categories = await prisma.category.findMany({ orderBy: { name: 'asc' }});
         res.json(categories);
@@ -19,7 +20,8 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 
 // POST a new category
 // Fix: Added types for req and res.
-router.post('/', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.post('/', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { name, parentId } = req.body;
     try {
         const newCategory = await prisma.category.create({
@@ -33,7 +35,8 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
 // PUT to update a category
 // Fix: Added types for req and res.
-router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.put('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     const { name, parentId } = req.body;
     try {
@@ -49,7 +52,8 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
 
 // DELETE a category
 // Fix: Added types for req and res.
-router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.delete('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     try {
         await prisma.category.delete({ where: { id } });

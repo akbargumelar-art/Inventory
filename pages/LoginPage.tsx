@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -6,8 +5,8 @@ import toast from 'react-hot-toast';
 import { InventoryIcon } from '../constants/icons';
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('admin@inventory.com');
-  const [password, setPassword] = useState('password'); // Dummy password for demo
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -16,13 +15,13 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = await login(email, password);
+    const success = await login(username, password);
     if (success) {
       toast.success('Login berhasil!');
       navigate('/dashboard');
     } else {
-      setError('Email atau password salah.');
-      toast.error('Email atau password salah.');
+      setError('Username atau password salah.');
+      toast.error('Username atau password salah.');
     }
   };
 
@@ -40,13 +39,13 @@ const LoginPage: React.FC = () => {
               </h1>
               <form onSubmit={handleSubmit}>
                 <label className="block text-sm">
-                  <span className="text-gray-700">Email</span>
+                  <span className="text-gray-700">Username</span>
                   <input
                     className={commonInputStyle}
-                    placeholder="john@doe.com"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="e.g. admin"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                   />
                 </label>

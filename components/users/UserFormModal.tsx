@@ -17,7 +17,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSave, 
       const { password, ...userData } = user;
       setFormData(userData);
     } else {
-      setFormData({ name: '', email: '', role: 'Viewer', password: '' });
+      setFormData({ name: '', username: '', email: '', role: 'Viewer', password: '' });
     }
   }, [user, isOpen]);
 
@@ -47,6 +47,10 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSave, 
             <div>
               <label className="block text-sm text-gray-700">Nama Lengkap</label>
               <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required className={commonInputStyle} />
+            </div>
+             <div>
+              <label className="block text-sm text-gray-700">Username</label>
+              <input type="text" name="username" value={formData.username || ''} onChange={handleChange} required className={commonInputStyle} />
             </div>
              <div>
               <label className="block text-sm text-gray-700">Email</label>

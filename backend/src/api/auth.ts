@@ -1,5 +1,5 @@
 // Fix: Use ES module import for Express.
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -9,15 +9,16 @@ const prisma = new PrismaClient();
 
 // POST /api/auth/login
 // Fix: Added types for req and res.
-router.post('/login', async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.post('/login', async (req: express.Request, res: express.Response) => {
+  const { username, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required' });
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { username } });
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });

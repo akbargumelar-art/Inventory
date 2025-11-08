@@ -1,5 +1,5 @@
 // Fix: Use ES module import for Express.
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth';
 
@@ -8,7 +8,8 @@ const prisma = new PrismaClient();
 
 // GET all locations
 // Fix: Added types for req and res.
-router.get('/', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.get('/', authMiddleware, async (req: express.Request, res: express.Response) => {
     try {
         const locations = await prisma.location.findMany({ orderBy: { name: 'asc' }});
         res.json(locations);
@@ -19,7 +20,8 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 
 // POST a new location
 // Fix: Added types for req and res.
-router.post('/', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.post('/', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { name, code, address, description } = req.body;
     try {
         const newLocation = await prisma.location.create({
@@ -33,7 +35,8 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
 // PUT to update a location
 // Fix: Added types for req and res.
-router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.put('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     const { name, code, address, description } = req.body;
     try {
@@ -49,7 +52,8 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
 
 // DELETE a location
 // Fix: Added types for req and res.
-router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.delete('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     try {
         await prisma.location.delete({ where: { id } });

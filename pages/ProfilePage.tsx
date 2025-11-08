@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
@@ -16,6 +15,7 @@ const ProfilePage: React.FC = () => {
       setFormData({
         id: currentUser.id,
         name: currentUser.name,
+        username: currentUser.username,
         email: currentUser.email,
         role: currentUser.role,
       });
@@ -77,6 +77,18 @@ const ProfilePage: React.FC = () => {
                         onChange={handleChange}
                         className={commonInputStyle}
                         required
+                        />
+                    </label>
+                 </div>
+                 <div>
+                    <label className="block text-sm">
+                        <span className="text-gray-700">Username</span>
+                        <input
+                        type="text"
+                        name="username"
+                        value={formData.username || ''}
+                        disabled
+                        className={`${commonInputStyle} bg-gray-100 cursor-not-allowed`}
                         />
                     </label>
                  </div>

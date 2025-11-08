@@ -10,7 +10,7 @@ interface AuthState {
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, password?: string) => Promise<boolean>;
+  login: (username: string, password?: string) => Promise<boolean>;
   logout: () => void;
   updateProfile: (updatedData: Partial<User>) => Promise<void>;
 }
@@ -28,9 +28,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const login = async (email: string, password?: string): Promise<boolean> => {
+  const login = async (username: string, password?: string): Promise<boolean> => {
     try {
-      const response = await apiClient.post<{ token: string; user: User }>('/auth/login', { email, password });
+      const response = await apiClient.post<{ token: string; user: User }>('/auth/login', { username, password });
       if (response.token && response.user) {
         const authData = { token: response.token, user: response.user };
         setAuth(authData);

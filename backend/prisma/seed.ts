@@ -1,4 +1,3 @@
-
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 // Fix: Import 'exit' from 'process' to avoid type error on the global process object.
@@ -14,9 +13,10 @@ async function main() {
 
   // Seed Users
   await prisma.user.upsert({
-    where: { email: 'admin@inventory.com' },
+    where: { username: 'admin' },
     update: { password: adminPassword },
     create: {
+      username: 'admin',
       email: 'admin@inventory.com',
       name: 'Admin',
       password: adminPassword,
@@ -25,9 +25,10 @@ async function main() {
   });
 
   await prisma.user.upsert({
-    where: { email: 'akbar@inventory.com' },
+    where: { username: 'akbar' },
     update: { password: akbarPassword },
     create: {
+      username: 'akbar',
       email: 'akbar@inventory.com',
       name: 'Akbar',
       password: akbarPassword,

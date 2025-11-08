@@ -1,5 +1,5 @@
 // Fix: Use ES module import for Express.
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
@@ -9,10 +9,11 @@ const prisma = new PrismaClient();
 
 // GET all users
 // Fix: Added types for req and res.
-router.get('/', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.get('/', authMiddleware, async (req: express.Request, res: express.Response) => {
     try {
         const users = await prisma.user.findMany({
-            select: { id: true, name: true, email: true, role: true, createdAt: true },
+            select: { id: true, name: true, username: true, email: true, role: true, createdAt: true },
             orderBy: { name: 'asc' }
         });
         res.json(users);
@@ -23,13 +24,14 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 
 // POST a new user
 // Fix: Added types for req and res.
-router.post('/', authMiddleware, async (req: Request, res: Response) => {
-    const { name, email, password, role } = req.body;
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.post('/', authMiddleware, async (req: express.Request, res: express.Response) => {
+    const { name, username, email, password, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     try {
         const newUser = await prisma.user.create({
-            data: { name, email, password: hashedPassword, role },
-            select: { id: true, name: true, email: true, role: true, createdAt: true },
+            data: { name, username, email, password: hashedPassword, role },
+            select: { id: true, name: true, username: true, email: true, role: true, createdAt: true },
         });
         res.status(201).json(newUser);
     } catch (error) {
@@ -39,11 +41,12 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
 // PUT to update a user
 // Fix: Added types for req and res.
-router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.put('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
-    const { name, email, role, password } = req.body;
+    const { name, username, email, role, password } = req.body;
     
-    let data: any = { name, email, role };
+    let data: any = { name, username, email, role };
     if (password) {
         data.password = await bcrypt.hash(password, 10);
     }
@@ -52,7 +55,7 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
         const updatedUser = await prisma.user.update({
             where: { id },
             data,
-            select: { id: true, name: true, email: true, role: true, createdAt: true },
+            select: { id: true, name: true, username: true, email: true, role: true, createdAt: true },
         });
         res.json(updatedUser);
     } catch (error) {
@@ -62,7 +65,8 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
 
 // DELETE a user
 // Fix: Added types for req and res.
-router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
+// Fix: Used express.Request and express.Response types to avoid type conflicts.
+router.delete('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     try {
         await prisma.user.delete({ where: { id } });

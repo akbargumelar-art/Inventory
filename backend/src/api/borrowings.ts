@@ -1,5 +1,5 @@
 // Fix: Use ES module import for Express.
-import express, { Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
@@ -8,7 +8,8 @@ const prisma = new PrismaClient();
 
 // GET all borrowings
 // Fix: Added types for req and res.
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Used express.Response to avoid type conflicts.
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const borrowings = await prisma.borrowing.findMany({ orderBy: { borrowDate: 'desc' }});
         res.json(borrowings);
@@ -19,7 +20,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 
 // POST a new borrowing
 // Fix: Added type for req.
-router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Used express.Response to avoid type conflicts.
+router.post('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     const { itemId, borrowerName, borrowDate, expectedReturnDate, notes } = req.body;
     const userId = req.user?.userId;
 
@@ -68,7 +70,8 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 
 // PUT to return a borrowing
 // Fix: Added types for req and res.
-router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Used express.Response to avoid type conflicts.
+router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
 

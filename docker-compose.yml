@@ -5,14 +5,12 @@ services:
     build: ./backend
     container_name: inventory_backend
     restart: always
+    env_file: ./.env # Memuat variabel dari file .env di root
     ports:
       - "6001:6001"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      PORT: 6001
     depends_on:
-      - db
+      db:
+        condition: service_healthy # Menunggu database siap
     networks:
       - app-network
 
@@ -31,6 +29,10 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
 volumes:
   db-data:

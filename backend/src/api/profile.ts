@@ -1,5 +1,5 @@
 // Fix: Use ES module import for Express.
-import express, { Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
@@ -9,12 +9,13 @@ const prisma = new PrismaClient();
 
 // GET current user's profile
 // Fix: Added explicit types for req and res.
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Used express.Response to avoid type conflicts.
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     const userId = req.user?.userId;
     try {
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, name: true, email: true, role: true }
+            select: { id: true, name: true, username: true, email: true, role: true }
         });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -27,9 +28,10 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 
 // PUT to update current user's profile
 // Fix: Added explicit types for req and res.
-router.put('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Used express.Response to avoid type conflicts.
+router.put('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     const userId = req.user?.userId;
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body; // username is not updatable from profile
 
     let dataToUpdate: any = { name, email };
     if (password) {
@@ -40,7 +42,7 @@ router.put('/', authMiddleware, async (req: AuthRequest, res: Response) => {
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: dataToUpdate,
-            select: { id: true, name: true, email: true, role: true }
+            select: { id: true, name: true, username: true, email: true, role: true }
         });
         res.json(updatedUser);
     } catch (error) {
