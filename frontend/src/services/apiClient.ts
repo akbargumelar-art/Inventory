@@ -1,7 +1,7 @@
 // FIXED: Use environment variable for API base URL to support both local dev and Docker deployment.
-// Fix: Cast `import.meta` to `any` to resolve TypeScript error `Property 'env' does not exist on type 'ImportMeta'`.
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || '/api';
-
+// The /api path will be proxied by Nginx in production (Docker)
+// and by Vite dev server in development.
+const API_BASE_URL = '/api';
 
 const getAuthToken = (): string | null => {
     const authData = sessionStorage.getItem('auth');
