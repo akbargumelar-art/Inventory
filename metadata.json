@@ -1,0 +1,5 @@
+{
+  "name": "Sistem Manajemen Inventori",
+  "description": "Aplikasi web full-stack untuk manajemen inventori barang yang modern, responsif, dan mudah digunakan. Mendukung fitur lokasi, tipe barang, stok, harga, barcode, dan media (gambar/video).",
+  "requestFramePermissions": []
+}
