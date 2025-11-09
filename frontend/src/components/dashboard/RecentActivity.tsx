@@ -21,7 +21,6 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
         return `${user} mengoreksi stok ${itemName} sejumlah ${activity.quantityChange} unit.`;
       case 'Transfer':
         return `${user} mentransfer ${quantity} unit ${itemName} dari ${activity.fromLocation?.name} ke ${activity.toLocation?.name}.`;
-      // Fix: Add cases for borrowing and returning items
       case 'Dipinjamkan':
         return `${quantity} unit ${itemName} dipinjamkan.`;
       case 'Dikembalikan':

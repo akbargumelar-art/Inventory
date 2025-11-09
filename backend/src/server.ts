@@ -1,5 +1,4 @@
 
-// Fix: Use explicit imports for Express types to resolve type conflicts.
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';

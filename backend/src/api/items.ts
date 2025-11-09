@@ -1,9 +1,7 @@
 
-// Fix: Use standard imports for Express and `require` for Prisma to resolve type errors.
 import express, { Response } from 'express';
 const { PrismaClient } = require('@prisma/client');
-// Fix: Use `import type` for Prisma types to resolve module resolution issues.
-import type { Prisma, Item } from '@prisma/client';
+import type { Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();

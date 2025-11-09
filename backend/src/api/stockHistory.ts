@@ -1,8 +1,6 @@
 
-// Fix: Use standard imports for Express and `require` for Prisma to resolve type errors.
 import express, { Response } from 'express';
 const { PrismaClient } = require('@prisma/client');
-// Fix: Use `import type` for Prisma types to resolve module resolution issues.
 import type { StockHistory, User } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 

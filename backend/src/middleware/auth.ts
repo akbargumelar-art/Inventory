@@ -1,9 +1,7 @@
 
-// Fix: Use explicit imports for Express types to resolve type conflicts.
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-// Fix: Redefined AuthRequest to extend the imported express.Request type.
 export interface AuthRequest extends Request {
   user?: { userId: string; role: string };
 };

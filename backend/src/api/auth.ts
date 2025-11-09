@@ -1,5 +1,4 @@
 
-// Fix: Use standard imports for Express and `require` for Prisma to resolve type errors.
 import express, { Request, Response } from 'express';
 const { PrismaClient } = require('@prisma/client');
 import bcrypt from 'bcryptjs';
