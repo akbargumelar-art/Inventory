@@ -1,22 +1,18 @@
 
-// Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
+// Fix: Use `require` to conform to the CommonJS module system used by the project.
 const { PrismaClient } = require('@prisma/client');
-import bcrypt from 'bcryptjs';
-// Fix: Import 'exit' from 'process' to avoid type error on the global process object.
-import { exit } from 'process';
+const bcrypt = require('bcryptjs');
+const { exit } = require('process');
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Start seeding ...');
 
-  // FIXED: Hashed passwords for seed users as per request.
   const adminPassword = await bcrypt.hash('password', 10);
-  const akbarPassword = await bcrypt.hash('password', 10); // FIXED: Changed password to 'password' as requested.
+  const akbarPassword = await bcrypt.hash('password', 10);
 
   // Seed Users
-  // NOTE: User requested 'ADMIN' role, but the application schema uses 'Administrator'.
-  // Using 'Administrator' for consistency with the existing system.
   await prisma.user.upsert({
     where: { username: 'admin' },
     update: { password: adminPassword },
@@ -37,7 +33,7 @@ async function main() {
       email: 'akbar@inventory.com',
       name: 'Akbar',
       password: akbarPassword,
-      role: 'Administrator', // FIXED: Role is Administrator.
+      role: 'Administrator',
     },
   });
 
@@ -67,7 +63,7 @@ async function main() {
 
   // Seed Category
   const elektronik = await prisma.category.upsert({
-      where: { id: 'clerk_elektronik'}, // use a deterministic id if needed
+      where: { id: 'clerk_elektronik'},
       update: {},
       create: {
         id: 'clerk_elektronik',
