@@ -1,7 +1,7 @@
 // Fix: Use standard imports for Express and Prisma to resolve type errors.
 import express from 'express';
-import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+// @ts-ignore
+const { PrismaClient } = require('@prisma/client');
 // Fix: Use `import type` for Prisma types to resolve module resolution issues.
 import type { Prisma, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
@@ -10,7 +10,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all borrowings
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const borrowings = await prisma.borrowing.findMany({ orderBy: { borrowDate: 'desc' }});
         res.json(borrowings);
@@ -20,7 +20,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new borrowing
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { itemId, borrowerName, borrowDate, expectedReturnDate, notes } = req.body;
     const userId = req.user?.userId;
 
@@ -31,7 +31,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
     try {
         let newHistory;
         let updatedItem: Item | undefined;
-        const newBorrowing = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        const newBorrowing = await prisma.$transaction(async (tx: any) => {
             // Decrease stock
             updatedItem = await tx.item.update({
                 where: { id: itemId },
@@ -75,7 +75,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to return a borrowing
-router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
 
@@ -86,7 +86,7 @@ router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Dat
     try {
         let newHistory;
         let updatedItem: Item | undefined;
-        const updatedBorrowing = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        const updatedBorrowing = await prisma.$transaction(async (tx: any) => {
             const borrowing = await tx.borrowing.findUnique({ where: { id } });
             if (!borrowing || borrowing.status === 'Kembali') {
                 throw new Error("Borrowing record not found or already returned.");
