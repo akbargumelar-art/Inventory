@@ -1,5 +1,6 @@
-// Fix: Use ES module import for Express.
-import express from 'express';
+
+// Fix: Use specific imports from Express for correct type resolution.
+import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -8,9 +9,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/auth/login
-// Fix: Added types for req and res.
-// Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.post('/login', async (req: express.Request, res: express.Response) => {
+// Fix: Used imported Request and Response types.
+router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {

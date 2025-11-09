@@ -1,5 +1,6 @@
-// Fix: Changed express import to use ES module syntax.
-import express from 'express';
+
+// Fix: Use more specific imports from express to resolve type conflicts.
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './api/auth';
@@ -13,7 +14,8 @@ import stockHistoryRoutes from './api/stockHistory';
 
 dotenv.config();
 
-const app: express.Express = express();
+// Fix: Removed explicit type to allow for better type inference from express().
+const app = express();
 const port = process.env.PORT || 6001;
 
 // Middleware
@@ -32,16 +34,14 @@ app.use('/api/stock-history', stockHistoryRoutes);
 
 
 // Health Check
-// Fix: Added Request and Response types to the handler.
-// Fix: Used express.Request and express.Response types to avoid type conflicts.
-app.get('/', (req: express.Request, res: express.Response) => {
+// Fix: Used imported Request and Response types.
+app.get('/', (req: Request, res: Response) => {
   res.send('Inventory Management API is running!');
 });
 
 // Global Error Handler
-// Fix: Added types for all arguments in the error handler.
-// Fix: Used express.Request, express.Response, and express.NextFunction types to avoid type conflicts.
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// Fix: Used imported Request, Response, and NextFunction types.
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });
