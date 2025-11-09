@@ -1,15 +1,16 @@
-// Fix: Combined express default and type imports to resolve type conflicts.
-import express, { Response } from 'express';
+// Fix: Use default import for express to avoid type conflicts with global Response type.
+import express from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
 const { PrismaClient } = require('@prisma/client');
-import type { Prisma, Item } from '@prisma/client';
+// Fix: Import Prisma types directly to resolve module resolution issues.
+import { Prisma, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all items - accessible by all authenticated users
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const items = await prisma.item.findMany({ 
             // include: { media: true },
@@ -23,7 +24,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new item - Administrator & Input Data
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { ...itemData } = req.body;
     // active field is replaced by status
     delete itemData.active;
@@ -48,7 +49,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update an item - Administrator & Input Data
-router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
      // remove fields that shouldn't be updated directly
@@ -75,7 +76,7 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE an item - Administrator only
-router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     try {
         // In a real app, you might need to handle related records first
@@ -88,7 +89,7 @@ router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: 
 });
 
 // POST to adjust stock - Administrator & Input Data
-router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;
     const userId = req.user?.userId;
