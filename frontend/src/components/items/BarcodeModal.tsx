@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Item } from '../../types';
 import { BarcodeIcon, QrCodeIcon } from '../../constants/icons';
@@ -107,7 +108,7 @@ const BarcodeModal: React.FC<BarcodeModalProps> = ({ isOpen, onClose, item }) =>
             </div>
             <div>
               <p className="text-center font-semibold flex items-center"><QrCodeIcon className="mr-2"/> QR Code</p>
-              {/* Fix: Pass item.sku to the QRCode component */}
+              {/* Fix: Pass item.sku to the QRCode component value prop. */}
               <div className="p-2 bg-white rounded"><QRCode value={item.sku} /></div>
               <p className="text-center text-xs font-mono mt-1">{item.sku}</p>
             </div>

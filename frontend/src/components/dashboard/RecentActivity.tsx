@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StockHistory } from '../../types';
 
@@ -25,6 +26,14 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
         return `${quantity} unit ${itemName} dipinjamkan.`;
       case 'Dikembalikan':
         return `${quantity} unit ${itemName} dikembalikan.`;
+      case 'Dijual':
+        return `${user} mencatat penjualan ${quantity} unit ${itemName}.`;
+      case 'Hilang':
+        return `${user} mencatat kehilangan ${quantity} unit ${itemName}.`;
+      case 'Diberikan':
+        return `${user} memberikan ${quantity} unit ${itemName}.`;
+      case 'Retur':
+          return `${user} menerima retur ${quantity} unit ${itemName}.`;
       default:
         return `${user} melakukan: ${activity.type} ${quantity} unit ${itemName}.`;
     }

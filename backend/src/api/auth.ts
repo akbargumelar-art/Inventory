@@ -1,6 +1,7 @@
-// Fix: Use standard imports for Express and Prisma to resolve type errors.
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
+
+// Fix: Use standard imports for Express and `require` for Prisma to resolve type errors.
+import express, { Request, Response } from 'express';
+const { PrismaClient } = require('@prisma/client');
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -8,7 +9,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/auth/login
-router.post('/login', async (req: express.Request, res: express.Response) => {
+router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
