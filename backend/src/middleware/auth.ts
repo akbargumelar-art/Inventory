@@ -1,8 +1,8 @@
-
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-export interface AuthRequest extends Request {
+// Fix: Changed interface to a type intersection to resolve handler signature compatibility issues.
+export type AuthRequest = Request & {
   user?: { userId: string; role: string };
 };
 

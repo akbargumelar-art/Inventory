@@ -1,7 +1,6 @@
-
 import express, { Response } from 'express';
-const { PrismaClient } = require('@prisma/client');
-import type { Item } from '@prisma/client';
+// Fix: Changed require and type-only import to a single ES module import.
+import { PrismaClient, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();

@@ -1,6 +1,6 @@
-
 import express, { Response } from 'express';
-const { PrismaClient } = require('@prisma/client');
+// Fix: Changed require to import for ES module consistency.
+import { PrismaClient } from '@prisma/client';
 import { authMiddleware, authorize, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 
