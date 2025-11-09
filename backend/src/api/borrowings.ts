@@ -30,12 +30,18 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     }
 
     try {
+        let newHistory;
+        let updatedItem;
         const newBorrowing = await prisma.$transaction(async (tx) => {
             // Decrease stock
-            await tx.item.update({
+            updatedItem = await tx.item.update({
                 where: { id: itemId },
                 data: { stock: { decrement: 1 } },
             });
+
+            if (updatedItem.stock < 0) {
+                throw new Error("Stok tidak mencukupi.");
+            }
 
             // Create borrowing record
             const borrowing = await tx.borrowing.create({
@@ -49,19 +55,20 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
                 },
             });
             // Create stock history record
-            await tx.stockHistory.create({
+            newHistory = await tx.stockHistory.create({
                 data: {
                     itemId: itemId,
                     userId: userId,
                     quantityChange: -1,
                     type: 'Dipinjamkan',
                     reason: `Dipinjam oleh ${borrowerName}`,
-                }
+                },
+                 include: { user: { select: { id: true, name: true, email: true, role: true }}, item: { select: { id: true, name: true, sku: true }} }
             });
 
             return borrowing;
         });
-        res.status(201).json(newBorrowing);
+        res.status(201).json({ newBorrowing, newHistory, updatedItem: {...updatedItem, media: []} });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error creating borrowing record', error: err.message });
@@ -80,6 +87,8 @@ router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response
     }
 
     try {
+        let newHistory;
+        let updatedItem;
         const updatedBorrowing = await prisma.$transaction(async (tx) => {
             const borrowing = await tx.borrowing.findUnique({ where: { id } });
             if (!borrowing || borrowing.status === 'Kembali') {
@@ -87,20 +96,21 @@ router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response
             }
 
             // Increase stock
-            await tx.item.update({
+            updatedItem = await tx.item.update({
                 where: { id: borrowing.itemId },
                 data: { stock: { increment: 1 } },
             });
 
             // Create stock history record
-            await tx.stockHistory.create({
+            newHistory = await tx.stockHistory.create({
                 data: {
                     itemId: borrowing.itemId,
                     userId,
                     quantityChange: 1,
                     type: 'Dikembalikan',
                     reason: `Dikembalikan oleh ${borrowing.borrowerName}`,
-                }
+                },
+                include: { user: { select: { id: true, name: true, email: true, role: true }}, item: { select: { id: true, name: true, sku: true }} }
             });
 
             // Update borrowing status
@@ -112,7 +122,7 @@ router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response
                 },
             });
         });
-        res.json(updatedBorrowing);
+        res.json({ updatedBorrowing, newHistory, updatedItem: {...updatedItem, media: []} });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error returning item', error: err.message });

@@ -15,7 +15,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
             // include: { media: true },
             orderBy: { createdAt: 'desc' }
         });
-        res.json(items.map(item => ({...item, media: []}))); // Return empty media array for now
+        // FIXED: Return empty media array for now as media upload is not implemented.
+        res.json(items.map(item => ({...item, media: []}))); 
     } catch (error) {
         res.status(500).json({ message: 'Error fetching items', error });
     }
@@ -105,6 +106,7 @@ router.post('/:id/adjust', authMiddleware, async (req: AuthRequest, res: Respons
     }
 
     try {
+        let newHistory;
         const updatedItem = await prisma.$transaction(async (tx) => {
             const item = await tx.item.update({
                 where: { id },
@@ -115,20 +117,22 @@ router.post('/:id/adjust', authMiddleware, async (req: AuthRequest, res: Respons
                 }
             });
 
-            await tx.stockHistory.create({
+            newHistory = await tx.stockHistory.create({
                 data: {
                     itemId: id,
                     userId,
                     quantityChange,
                     type,
                     reason,
-                }
+                },
+                include: { user: { select: { id: true, name: true, email: true, role: true }}, item: { select: { id: true, name: true, sku: true }} }
             });
 
             return item;
         });
 
-        res.json({...updatedItem, media: []});
+        // FIXED: Return both the updated item and the new history record.
+        res.json({ updatedItem: {...updatedItem, media: []}, newHistory });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error adjusting stock', error: err.message });

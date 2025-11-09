@@ -4,12 +4,12 @@ Aplikasi web full-stack untuk manajemen inventori barang yang modern, responsif,
 
 ## ✨ Fitur Utama
 
-- **Login Berbasis Username.**
+- **Login Berbasis Username & Password.**
 - **Manajemen Inventori Lengkap:** Kelola Barang, Kategori, dan Lokasi.
 - **Transaksi Stok:** Catat penyesuaian stok (dijual, hilang, penerimaan).
 - **Manajemen Peminjaman:** Lacak barang yang sedang dipinjam dan kapan harus kembali.
 - **Manajemen Pengguna:** Sistem role (Admin, Input Data, Viewer).
-- **Autentikasi Aman:** Menggunakan JSON Web Tokens (JWT).
+- **Autentikasi Aman:** Menggunakan JSON Web Tokens (JWT) dengan password yang di-hash.
 - **Desain Responsif:** Tampilan optimal di desktop (dengan sidebar) dan mobile (dengan navigasi bawah).
 - **Siap Deploy:** Konfigurasi Docker dan panduan deployment lengkap.
 
@@ -22,7 +22,7 @@ Aplikasi web full-stack untuk manajemen inventori barang yang modern, responsif,
 - **Autentikasi:** JWT, bcryptjs
 - **Deployment:** Docker, Docker Compose, Nginx
 
-## 📂 Struktur Proyek (FIXED)
+## 📂 Struktur Proyek
 
 ```
 inventori-app/
@@ -33,9 +33,9 @@ inventori-app/
 ├── frontend/
 │   ├── public/             # Aset statis
 │   ├── src/                # Kode sumber frontend React
-│   ├── Dockerfile          # Instruksi build frontend (dengan Nginx)
-│   └── nginx.conf          # Konfigurasi Nginx
-├── .env.example            # Template konfigurasi
+│   ├── Dockerfile          # Instruksi build frontend
+│   └── nginx.conf          # Konfigurasi Nginx untuk proxy
+├── .env.example            # Template konfigurasi environment
 ├── docker-compose.yml      # Orkestrasi semua container
 └── README.md
 ```
@@ -63,17 +63,17 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
       ```bash
       cp .env.example .env
       ```
-    - Buka `.env` dan ganti `JWT_SECRET` dengan string acak yang kuat. Anda bisa membuatnya dengan `openssl rand -base64 32`.
+    - Buka `.env` dan ganti `JWT_SECRET` dengan string acak yang kuat. Anda bisa membuatnya di terminal dengan `openssl rand -base64 32`.
 
 3.  **Jalankan Aplikasi dengan Docker Compose**
     - Dari direktori root proyek, jalankan perintah:
       ```bash
       docker-compose up --build -d
       ```
-    - Perintah ini akan membangun image Docker untuk frontend dan backend, serta menjalankan semua container. Tunggu beberapa saat hingga proses selesai.
+    - Perintah ini akan membangun image Docker untuk frontend dan backend, serta menjalankan semua container (frontend, backend, db). Tunggu beberapa saat hingga proses selesai.
 
 4.  **Setup Database (Hanya saat pertama kali)**
-    - Pastikan container sudah berjalan (`docker ps`).
+    - Pastikan semua container sudah berjalan dengan perintah `docker ps`.
     - Jalankan migrasi Prisma untuk membuat semua tabel di database.
       ```bash
       docker-compose exec backend npx prisma migrate deploy
@@ -86,7 +86,7 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
 5.  **Akses Aplikasi**
     - Aplikasi sekarang dapat diakses di browser Anda pada alamat `http://localhost`.
     - Anda bisa login dengan:
-      - **Username:** `akbar`
+      - **Username:** `admin` atau `akbar`
       - **Password:** `password`
 
 ---
@@ -96,4 +96,8 @@ Ini adalah cara yang direkomendasikan karena paling mendekati lingkungan produks
 Untuk menghentikan semua container yang berjalan, jalankan perintah berikut dari direktori root proyek:
 ```bash
 docker-compose down
+```
+Untuk menghapus volume database juga (data akan hilang permanen), gunakan:
+```bash
+docker-compose down -v
 ```
