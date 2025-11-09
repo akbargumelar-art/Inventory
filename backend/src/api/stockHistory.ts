@@ -1,10 +1,10 @@
 import express, { Response } from 'express';
-// Fix: Changed require and type-only import to a single ES module import.
-import { PrismaClient, StockHistory, User } from '@prisma/client';
+// Fix: Use namespace import for Prisma Client to resolve module issues.
+import * as Prisma from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
-const prisma = new PrismaClient();
+const prisma = new Prisma.PrismaClient();
 
 // GET all stock history
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
@@ -22,8 +22,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
             }
         });
         
-        type HistoryRecord = StockHistory & {
-            user: Partial<User>;
+        type HistoryRecord = Prisma.StockHistory & {
+            user: Partial<Prisma.User>;
             item: { id: string; name: string; sku: string; };
         };
 

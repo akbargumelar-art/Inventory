@@ -1,11 +1,11 @@
 import express, { Response } from 'express';
-// Fix: Changed require to import for ES module consistency.
-import { PrismaClient } from '@prisma/client';
+// Fix: Use namespace import for Prisma Client to resolve module issues.
+import * as Prisma from '@prisma/client';
 import { authMiddleware, authorize, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 
 const router = express.Router();
-const prisma = new PrismaClient();
+const prisma = new Prisma.PrismaClient();
 
 // GET all users
 router.get('/', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {

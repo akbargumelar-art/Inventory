@@ -1,10 +1,10 @@
 import express, { Response } from 'express';
-// Fix: Changed require and type-only import to a single ES module import.
-import { PrismaClient, Item } from '@prisma/client';
+// Fix: Use namespace import for Prisma Client to resolve module issues.
+import * as Prisma from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
-const prisma = new PrismaClient();
+const prisma = new Prisma.PrismaClient();
 
 // GET all items - accessible by all authenticated users
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
@@ -14,7 +14,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
             orderBy: { createdAt: 'desc' }
         });
         // Return empty media array for now as media upload is not implemented.
-        res.json(items.map((item: Item) => ({...item, media: []}))); 
+        res.json(items.map((item: Prisma.Item) => ({...item, media: []}))); 
     } catch (error) {
         res.status(500).json({ message: 'Error fetching items', error });
     }
