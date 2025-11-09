@@ -1,4 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+
+// Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
+const { PrismaClient } = require('@prisma/client');
 import bcrypt from 'bcryptjs';
 // Fix: Import 'exit' from 'process' to avoid type error on the global process object.
 import { exit } from 'process';

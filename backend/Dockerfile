@@ -1,42 +1,41 @@
-# Tahap 1: Build Aplikasi
+# Stage 1: Build the application
 FROM node:20-alpine AS builder
+
 WORKDIR /usr/src/app
 
-# Salin file package.json dan package-lock.json
+# Copy package files and install dependencies
 COPY package*.json ./
-
-# Install dependensi
 RUN npm install
 
-# Salin skema Prisma
+# Copy prisma schema
 COPY prisma ./prisma/
 
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Salin sisa kode sumber
+# Copy the rest of the source code
 COPY . .
 
-# Build TypeScript ke JavaScript
+# Build TypeScript to JavaScript
 RUN npm run build
 
-# Tahap 2: Rilis (Production Image)
+# Stage 2: Create the production image
 FROM node:20-alpine
+
 WORKDIR /usr/src/app
 
-# Salin file package.json dan package-lock.json
+# Copy package files and install only production dependencies
 COPY package*.json ./
-
-# Install hanya dependensi produksi
 RUN npm install --omit=dev
 
-# Salin hasil build dari tahap 'builder'
+# Copy the built application from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/prisma ./prisma
-COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
-# Expose port yang digunakan aplikasi
+# Copy the prisma schema for runtime
+COPY --from=builder /usr/src/app/prisma ./prisma
+
+# Expose the port the app runs on
 EXPOSE 6001
 
-# Command untuk menjalankan aplikasi
-CMD ["node", "dist/server.js"]
+# Command to run the application
+CMD [ "node", "dist/server.js" ]

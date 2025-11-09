@@ -1,8 +1,9 @@
 
-// Fix: Use specific Response import from Express for correct type resolution.
-import express, { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-// Fix: Import AuthRequest to correctly type requests in authenticated routes.
+// Fix: Separated express import from type imports to resolve type conflicts.
+import express from 'express';
+import type { Response } from 'express';
+// Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
+const { PrismaClient } = require('@prisma/client');
 import { authMiddleware, authorize, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 
@@ -10,7 +11,6 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all users
-// Fix: Used AuthRequest and Response types.
 router.get('/', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     try {
         const users = await prisma.user.findMany({
@@ -24,7 +24,6 @@ router.get('/', authMiddleware, authorize(['Administrator']), async (req: AuthRe
 });
 
 // POST a new user
-// Fix: Used AuthRequest and Response types.
 router.post('/', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { name, username, email, password, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -40,7 +39,6 @@ router.post('/', authMiddleware, authorize(['Administrator']), async (req: AuthR
 });
 
 // PUT to update a user
-// Fix: Used AuthRequest and Response types.
 router.put('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { name, username, email, role, password } = req.body;
@@ -63,7 +61,6 @@ router.put('/:id', authMiddleware, authorize(['Administrator']), async (req: Aut
 });
 
 // DELETE a user
-// Fix: Used AuthRequest and Response types.
 router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
