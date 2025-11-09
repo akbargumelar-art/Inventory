@@ -1,3 +1,4 @@
+
 version: '3.8'
 
 services:
@@ -9,7 +10,7 @@ services:
     container_name: inventory_nginx
     restart: always
     ports:
-      - "80:80" # Maps port 80 of the host to port 80 of the container
+      - "8081:80" # FIXED: Changed host port to 8081 to avoid conflict.
     depends_on:
       - backend
     networks:
@@ -23,10 +24,8 @@ services:
     container_name: inventory_backend
     restart: always
     env_file: ./.env # Loads environment variables from the .env file
-    # The port is not exposed directly to the host. Access is through the nginx proxy.
     depends_on:
-      db:
-        condition: service_healthy # Waits for the database to be ready before starting
+      - db
     networks:
       - app-network
 
@@ -40,17 +39,12 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpassword
-    # Exposing the DB port is useful for local debugging with a GUI tool like SQLyog.
     ports:
-      - "3306:3306"
+      - "3307:3306" # Using port 3307 to avoid conflict with existing MySQL
     volumes:
       - db-data:/var/lib/mysql # Persists database data
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
 
 volumes:
   db-data:
