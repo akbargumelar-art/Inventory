@@ -1,5 +1,6 @@
 // Fix: Use default import for express to avoid type conflicts with global Request/Response types.
-import express from 'express';
+// FIX: import Request, Response types from express
+import express, { Request, Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
 const { PrismaClient } = require('@prisma/client');
 import bcrypt from 'bcryptjs';
@@ -9,7 +10,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/auth/login
-router.post('/login', async (req: express.Request, res: express.Response) => {
+// FIX: use imported Request and Response types
+router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {

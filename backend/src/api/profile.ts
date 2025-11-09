@@ -1,5 +1,6 @@
 // Fix: Use default import for express to avoid type conflicts with global Response type.
-import express from 'express';
+// FIX: import Response type from express
+import express, { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
 const { PrismaClient } = require('@prisma/client');
 import { authMiddleware, AuthRequest } from '../middleware/auth';
@@ -9,7 +10,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET current user's profile
-router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+// FIX: use imported Response type
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
     try {
         const user = await prisma.user.findUnique({
@@ -26,7 +28,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) 
 });
 
 // PUT to update current user's profile
-router.put('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+// FIX: use imported Response type
+router.put('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
     const { name, email, password } = req.body; // username is not updatable from profile
 

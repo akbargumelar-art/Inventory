@@ -1,5 +1,6 @@
 // Fix: Use default import for express to avoid type conflicts with global types.
-import express from 'express';
+// FIX: import Request, Response, NextFunction types from express
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './api/auth';
@@ -32,12 +33,14 @@ app.use('/api/stock-history', stockHistoryRoutes);
 
 
 // Health Check
-app.get('/', (req: express.Request, res: express.Response) => {
+// FIX: use imported Request and Response types
+app.get('/', (req: Request, res: Response) => {
   res.send('Inventory Management API is running!');
 });
 
 // Global Error Handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// FIX: use imported Request, Response, NextFunction types
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });

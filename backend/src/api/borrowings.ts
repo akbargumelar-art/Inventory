@@ -1,16 +1,19 @@
 // Fix: Use default import for express to avoid type conflicts with global Response type.
-import express from 'express';
+// FIX: import Response type from express
+import express, { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
 const { PrismaClient } = require('@prisma/client');
 // Fix: Import Prisma types directly to resolve module resolution issues.
-import { Prisma, Item } from '@prisma/client';
+// FIX: use `import type` for prisma types
+import type { Prisma, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all borrowings
-router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+// FIX: use imported Response type
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const borrowings = await prisma.borrowing.findMany({ orderBy: { borrowDate: 'desc' }});
         res.json(borrowings);
@@ -20,7 +23,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) 
 });
 
 // POST a new borrowing
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
+// FIX: use imported Response type
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { itemId, borrowerName, borrowDate, expectedReturnDate, notes } = req.body;
     const userId = req.user?.userId;
 
@@ -75,7 +79,8 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to return a borrowing
-router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
+// FIX: use imported Response type
+router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
 

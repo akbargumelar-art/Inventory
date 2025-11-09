@@ -1,8 +1,7 @@
-
 version: '3.8'
 
 services:
-  # This service builds and serves the frontend application using Nginx.
+  # Nginx service for the frontend.
   nginx:
     build:
       context: ./frontend
@@ -10,26 +9,29 @@ services:
     container_name: inventory_nginx
     restart: always
     ports:
-      - "8081:80" # FIXED: Changed host port to 8081 to avoid conflict.
+      # Exposes the frontend on port 8081 of the host machine.
+      - "8081:80"
     depends_on:
       - backend
     networks:
       - app-network
 
-  # This service runs the backend API.
+  # Backend API service.
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: inventory_backend
     restart: always
-    env_file: ./.env # Loads environment variables from the .env file
+    env_file: ./.env
     depends_on:
-      - db
+      db:
+        # This condition ensures the backend only starts after the database is healthy.
+        condition: service_healthy
     networks:
       - app-network
 
-  # This service runs the MySQL database.
+  # MySQL database service.
   db:
     image: mysql:8.0
     container_name: inventory_db
@@ -40,9 +42,16 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "3307:3306" # Using port 3307 to avoid conflict with existing MySQL
+      # Exposes the database on port 3307 of the host for external connections.
+      - "3307:3306"
     volumes:
-      - db-data:/var/lib/mysql # Persists database data
+      - db-data:/var/lib/mysql
+    # Healthcheck to verify the database is ready to accept connections.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
