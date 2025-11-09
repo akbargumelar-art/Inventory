@@ -1,7 +1,6 @@
 import express, { Response } from 'express';
 // Fix: Import Prisma types along with PrismaClient.
-import { PrismaClient } from '@prisma/client';
-import type { StockHistory as StockHistoryType, User as UserType } from '@prisma/client';
+import { PrismaClient, StockHistory as StockHistoryType, User as UserType } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();

@@ -2,7 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // INI ADALAH PERBAIKAN KUNCI UNTUK MASALAH DOCKER (ALPINE LINUX)
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -11,120 +13,79 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(cuid())
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String    @unique
   name         String
-  username     String        @unique
-  email        String        @unique
   password     String
-  role         UserRole      @default(Viewer)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  role         String // "Administrator", "Input Data", "Viewer"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
   stockHistory StockHistory[]
   borrowings   Borrowing[]
 }
 
-model Location {
-  id          String @id @default(cuid())
-  code        String @unique
-  name        String
-  address     String?
-  description String?
-  items       Item[]
-}
-
-model Category {
-  id        String     @id @default(cuid())
-  name      String
-  parentId  String?
-  parent    Category?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children  Category[] @relation("ParentChild")
-  items     Item[]
-}
-
 model Item {
-  id                String        @id @default(cuid())
-  sku               String        @unique
-  barcode           String        @unique
+  id                String    @id @default(cuid())
+  sku               String    @unique
+  barcode           String?
   name              String
-  description       String?
+  description       String?   @db.Text
   categoryId        String
-  category          Category      @relation(fields: [categoryId], references: [id])
+  category          Category  @relation(fields: [categoryId], references: [id])
   defaultLocationId String
-  location          Location      @relation(fields: [defaultLocationId], references: [id])
-  unit              ItemUnit      @default(pcs)
-  stock             Int           @default(0)
-  minStock          Int           @default(0)
-  price             Float         @default(0)
-  currency          String        @default("IDR")
-  status            ItemStatus    @default(Aktif)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  location          Location  @relation(fields: [defaultLocationId], references: [id])
+  unit              String // "pcs", "kg", "liter", "meter"
+  stock             Int       @default(0)
+  minStock          Int       @default(0)
+  price             Float     @default(0)
+  status            String // "Aktif", "Non-Aktif", "Baik", "Rusak"
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   stockHistory      StockHistory[]
   borrowings        Borrowing[]
 }
 
+model Location {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  name        String
+  address     String?
+  description String? @db.Text
+  items       Item[]
+}
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  parentId String?
+  parent   Category?  @relation("SubCategories", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children Category[] @relation("SubCategories")
+  items    Item[]
+}
+
 model StockHistory {
-  id             String           @id @default(cuid())
-  timestamp      DateTime         @default(now())
-  userId         String
-  user           User             @relation(fields: [userId], references: [id])
+  id             String   @id @default(cuid())
+  timestamp      DateTime @default(now())
   itemId         String
-  item           Item             @relation(fields: [itemId], references: [id])
-  type           StockHistoryType
+  item           Item     @relation(fields: [itemId], references: [id])
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  type           String // "Penerimaan", "Penjualan", "Transfer", "Koreksi", etc.
   quantityChange Int
   reason         String?
 }
 
 model Borrowing {
-  id                 String          @id @default(cuid())
+  id                 String    @id @default(cuid())
   itemId             String
-  item               Item            @relation(fields: [itemId], references: [id])
+  item               Item      @relation(fields: [itemId], references: [id])
   userId             String
-  user               User            @relation(fields: [userId], references: [id])
+  user               User      @relation(fields: [userId], references: [id])
   borrowerName       String
-  borrowDate         DateTime        @default(now())
+  borrowDate         DateTime  @default(now())
   expectedReturnDate DateTime
   actualReturnDate   DateTime?
-  status             BorrowingStatus @default(Dipinjam)
-  notes              String?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-}
-
-enum UserRole {
-  Administrator
-  InputData
-  Viewer
-}
-
-enum ItemUnit {
-  pcs
-  kg
-  liter
-  meter
-}
-
-enum ItemStatus {
-  Aktif
-  NonAktif
-  Baik
-  Rusak
-}
-
-enum StockHistoryType {
-  Penerimaan
-  Penjualan
-  Transfer
-  Koreksi
-  Retur
-  Dipinjamkan
-  Dikembalikan
-  Dijual
-  Hilang
-  Diberikan
-}
-
-enum BorrowingStatus {
-  Dipinjam
-  Kembali
+  status             String    @default("Dipinjam") // "Dipinjam", "Kembali"
+  notes              String?   @db.Text
 }

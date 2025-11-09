@@ -1,5 +1,5 @@
 // Fix: Use regular import for express types.
-import type { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export type AuthRequest = Request & {
