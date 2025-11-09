@@ -29,3 +29,12 @@ export const authMiddleware = (req: AuthRequest, res: express.Response, next: ex
     return res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
+
+export const authorize = (roles: string[]) => {
+  return (req: AuthRequest, res: express.Response, next: express.NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+    }
+    next();
+  };
+};

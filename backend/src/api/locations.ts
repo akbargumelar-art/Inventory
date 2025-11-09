@@ -1,7 +1,7 @@
 // Fix: Use ES module import for Express.
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware, authorize } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -21,7 +21,7 @@ router.get('/', authMiddleware, async (req: express.Request, res: express.Respon
 // POST a new location
 // Fix: Added types for req and res.
 // Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.post('/', authMiddleware, async (req: express.Request, res: express.Response) => {
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: express.Request, res: express.Response) => {
     const { name, code, address, description } = req.body;
     try {
         const newLocation = await prisma.location.create({
@@ -36,7 +36,7 @@ router.post('/', authMiddleware, async (req: express.Request, res: express.Respo
 // PUT to update a location
 // Fix: Added types for req and res.
 // Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.put('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
+router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     const { name, code, address, description } = req.body;
     try {
@@ -53,7 +53,7 @@ router.put('/:id', authMiddleware, async (req: express.Request, res: express.Res
 // DELETE a location
 // Fix: Added types for req and res.
 // Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.delete('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     try {
         await prisma.location.delete({ where: { id } });

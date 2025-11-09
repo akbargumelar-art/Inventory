@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Borrowing } from '../types';
 import { useData } from '../hooks/useData';
+import { useAuth } from '../hooks/useAuth';
 import { formatDate } from '../utils/formatter';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../components/common/ConfirmationModal';
@@ -10,9 +11,12 @@ import BorrowingFormModal from '../components/borrowing/BorrowingFormModal';
 
 const BorrowingsPage: React.FC = () => {
     const { borrowings, items, returnBorrowing, addBorrowing } = useData();
+    const { user } = useAuth();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [borrowingToReturn, setBorrowingToReturn] = useState<Borrowing | null>(null);
+
+    const canEdit = user?.role === 'Administrator' || user?.role === 'Input Data';
 
     const handleReturnClick = (borrowing: Borrowing) => {
         setBorrowingToReturn(borrowing);
@@ -42,12 +46,14 @@ const BorrowingsPage: React.FC = () => {
                 <h2 className="text-2xl font-semibold text-gray-700">
                     Riwayat Peminjaman
                 </h2>
-                <button
-                    onClick={() => setIsFormOpen(true)}
-                    className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none"
-                >
-                    Catat Peminjaman
-                </button>
+                {canEdit && (
+                  <button
+                      onClick={() => setIsFormOpen(true)}
+                      className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none"
+                  >
+                      Catat Peminjaman
+                  </button>
+                )}
             </div>
 
             <div className="w-full overflow-hidden rounded-lg shadow-xs">
@@ -59,7 +65,7 @@ const BorrowingsPage: React.FC = () => {
                                 <th className="px-4 py-3">Peminjam</th>
                                 <th className="px-4 py-3">Tgl Pinjam</th>
                                 <th className="px-4 py-3">Status</th>
-                                <th className="px-4 py-3">Aksi</th>
+                                {canEdit && <th className="px-4 py-3">Aksi</th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y">
@@ -73,13 +79,15 @@ const BorrowingsPage: React.FC = () => {
                                             {b.status}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-sm">
-                                        {b.status === 'Dipinjam' && (
-                                            <button onClick={() => handleReturnClick(b)} className="px-3 py-1 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600">
-                                                Kembalikan
-                                            </button>
-                                        )}
-                                    </td>
+                                    {canEdit && (
+                                      <td className="px-4 py-3 text-sm">
+                                          {b.status === 'Dipinjam' && (
+                                              <button onClick={() => handleReturnClick(b)} className="px-3 py-1 text-xs font-medium text-white bg-green-500 rounded-md hover:bg-green-600">
+                                                  Kembalikan
+                                              </button>
+                                          )}
+                                      </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>

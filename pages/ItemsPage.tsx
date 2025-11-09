@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Item } from '../types';
 import { useData } from '../hooks/useData';
+import { useAuth } from '../hooks/useAuth';
 import { formatCurrency } from '../utils/formatter';
 import ItemFormModal from '../components/items/ItemFormModal';
 import ItemDetailModal from '../components/items/ItemDetailModal';
@@ -26,6 +27,7 @@ const getStatusBadge = (status: Item['status']) => {
 
 const ItemsPage: React.FC = () => {
   const { items, categories, updateItem, addItem, deleteItem, adjustItemStock } = useData();
+  const { user } = useAuth();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
@@ -37,6 +39,9 @@ const ItemsPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+
+  const canEdit = user?.role === 'Administrator' || user?.role === 'Input Data';
+  const isAdmin = user?.role === 'Administrator';
 
   const filteredItems = useMemo(() => {
     return items.filter(item => {
@@ -102,12 +107,14 @@ const ItemsPage: React.FC = () => {
         <h2 className="text-2xl font-semibold text-gray-700">
           Daftar Barang
         </h2>
-        <button
-          onClick={handleAddItem}
-          className="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-emerald-600 border border-transparent rounded-lg active:bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:shadow-outline-emerald"
-        >
-          Tambah Barang
-        </button>
+        {canEdit && (
+          <button
+            onClick={handleAddItem}
+            className="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-emerald-600 border border-transparent rounded-lg active:bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:shadow-outline-emerald"
+          >
+            Tambah Barang
+          </button>
+        )}
       </div>
 
       <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -140,7 +147,7 @@ const ItemsPage: React.FC = () => {
                 <th className="px-4 py-3">Stok</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Harga</th>
-                <th className="px-4 py-3">Aksi</th>
+                {canEdit && <th className="px-4 py-3">Aksi</th>}
               </tr>
             </thead>
             <tbody className="bg-white divide-y">
@@ -165,19 +172,23 @@ const ItemsPage: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm">{formatCurrency(item.price)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center space-x-1 text-sm">
-                      <button onClick={(e) => handleAdjustStock(e, item)} className="p-2 text-gray-500 rounded-md hover:bg-gray-200" aria-label="Adjust Stock">
-                        <AdjustmentsIcon />
-                      </button>
-                      <button onClick={(e) => handleEditItem(e, item)} className="p-2 text-gray-500 rounded-md hover:bg-gray-200" aria-label="Edit">
-                        <PencilIcon />
-                      </button>
-                      <button onClick={(e) => handleDeleteClick(e, item)} className="p-2 text-red-500 rounded-md hover:bg-gray-200" aria-label="Delete">
-                        <TrashIcon />
-                      </button>
-                    </div>
-                  </td>
+                  {canEdit && (
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-1 text-sm">
+                        <button onClick={(e) => handleAdjustStock(e, item)} className="p-2 text-gray-500 rounded-md hover:bg-gray-200" aria-label="Adjust Stock">
+                          <AdjustmentsIcon />
+                        </button>
+                        <button onClick={(e) => handleEditItem(e, item)} className="p-2 text-gray-500 rounded-md hover:bg-gray-200" aria-label="Edit">
+                          <PencilIcon />
+                        </button>
+                        {isAdmin && (
+                          <button onClick={(e) => handleDeleteClick(e, item)} className="p-2 text-red-500 rounded-md hover:bg-gray-200" aria-label="Delete">
+                            <TrashIcon />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

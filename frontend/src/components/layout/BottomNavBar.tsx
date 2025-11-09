@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { DashboardIcon, BoxIcon, ClipboardListIcon, UsersIcon, PlusIcon } from '../../constants/icons';
 import ItemFormModal from '../items/ItemFormModal';
 import { useData } from '../../hooks/useData';
+import { useAuth } from '../../hooks/useAuth';
 import { Item } from '../../types';
 import toast from 'react-hot-toast';
 
@@ -17,6 +18,7 @@ const navLinks = [
 const BottomNavBar: React.FC = () => {
     const [isItemFormOpen, setIsItemFormOpen] = useState(false);
     const { addItem } = useData();
+    const { user } = useAuth();
 
     const handleSaveItem = (item: Item) => {
         addItem(item);
@@ -38,6 +40,8 @@ const BottomNavBar: React.FC = () => {
             <span>{text}</span>
         </NavLink>
     );
+    
+    const canEdit = user?.role === 'Administrator' || user?.role === 'Input Data';
 
     return (
         <>
@@ -47,17 +51,23 @@ const BottomNavBar: React.FC = () => {
                 <NavItem {...navLinks[1]} />
 
                 <div className="w-1/5">
-                    <button
-                        onClick={() => setIsItemFormOpen(true)}
-                        className="relative z-10 flex items-center justify-center w-14 h-14 mx-auto -mt-8 text-white bg-emerald-600 rounded-full shadow-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-                        aria-label="Tambah Barang"
-                    >
-                        <PlusIcon className="w-8 h-8" />
-                    </button>
+                    {canEdit && (
+                      <button
+                          onClick={() => setIsItemFormOpen(true)}
+                          className="relative z-10 flex items-center justify-center w-14 h-14 mx-auto -mt-8 text-white bg-emerald-600 rounded-full shadow-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                          aria-label="Tambah Barang"
+                      >
+                          <PlusIcon className="w-8 h-8" />
+                      </button>
+                    )}
                 </div>
 
                 <NavItem {...navLinks[2]} />
-                <NavItem {...navLinks[3]} />
+                {user?.role === 'Administrator' ? (
+                  <NavItem {...navLinks[3]} />
+                ) : (
+                  <div className="w-1/5" />
+                )}
                 </div>
             </div>
             {isItemFormOpen && (

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Category } from '../types';
 import { useData } from '../hooks/useData';
+import { useAuth } from '../hooks/useAuth';
 import { PencilIcon, TrashIcon } from '../constants/icons';
 import CategoryFormModal from '../components/categories/CategoryFormModal';
 import ConfirmationModal from '../components/common/ConfirmationModal';
@@ -9,10 +10,14 @@ import toast from 'react-hot-toast';
 
 const CategoriesPage: React.FC = () => {
   const { categories, addCategory, updateCategory, deleteCategory } = useData();
+  const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+
+  const canEdit = user?.role === 'Administrator' || user?.role === 'Input Data';
+  const isAdmin = user?.role === 'Administrator';
 
   const handleAdd = () => {
     setSelectedCategory(null);
@@ -55,12 +60,14 @@ const CategoriesPage: React.FC = () => {
         <h2 className="text-2xl font-semibold text-gray-700">
           Kategori Barang
         </h2>
-        <button
-          onClick={handleAdd}
-          className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none"
-        >
-          Tambah Kategori
-        </button>
+        {canEdit && (
+          <button
+            onClick={handleAdd}
+            className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none"
+          >
+            Tambah Kategori
+          </button>
+        )}
       </div>
 
       <div className="w-full overflow-hidden rounded-lg shadow-xs">
@@ -70,7 +77,7 @@ const CategoriesPage: React.FC = () => {
               <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
                 <th className="px-4 py-3">Nama Kategori</th>
                 <th className="px-4 py-3">Induk Kategori</th>
-                <th className="px-4 py-3">Aksi</th>
+                {canEdit && <th className="px-4 py-3">Aksi</th>}
               </tr>
             </thead>
             <tbody className="bg-white divide-y">
@@ -80,16 +87,20 @@ const CategoriesPage: React.FC = () => {
                   <td className="px-4 py-3 text-sm">
                     {cat.parentId ? categories.find(p => p.id === cat.parentId)?.name : '-'}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center space-x-2 text-sm">
-                      <button onClick={() => handleEdit(cat)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Edit">
-                        <PencilIcon />
-                      </button>
-                      <button onClick={() => handleDelete(cat)} className="p-2 text-red-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Delete">
-                        <TrashIcon />
-                      </button>
-                    </div>
-                  </td>
+                  {canEdit && (
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2 text-sm">
+                        <button onClick={() => handleEdit(cat)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Edit">
+                          <PencilIcon />
+                        </button>
+                        {isAdmin && (
+                          <button onClick={() => handleDelete(cat)} className="p-2 text-red-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Delete">
+                            <TrashIcon />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

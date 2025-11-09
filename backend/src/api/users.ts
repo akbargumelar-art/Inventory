@@ -1,7 +1,7 @@
 // Fix: Use ES module import for Express.
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware, authorize } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 
 const router = express.Router();
@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 // GET all users
 // Fix: Added types for req and res.
 // Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.get('/', authMiddleware, async (req: express.Request, res: express.Response) => {
+router.get('/', authMiddleware, authorize(['Administrator']), async (req: express.Request, res: express.Response) => {
     try {
         const users = await prisma.user.findMany({
             select: { id: true, name: true, username: true, email: true, role: true, createdAt: true },
@@ -25,7 +25,7 @@ router.get('/', authMiddleware, async (req: express.Request, res: express.Respon
 // POST a new user
 // Fix: Added types for req and res.
 // Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.post('/', authMiddleware, async (req: express.Request, res: express.Response) => {
+router.post('/', authMiddleware, authorize(['Administrator']), async (req: express.Request, res: express.Response) => {
     const { name, username, email, password, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     try {
@@ -42,7 +42,7 @@ router.post('/', authMiddleware, async (req: express.Request, res: express.Respo
 // PUT to update a user
 // Fix: Added types for req and res.
 // Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.put('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
+router.put('/:id', authMiddleware, authorize(['Administrator']), async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     const { name, username, email, role, password } = req.body;
     
@@ -66,7 +66,7 @@ router.put('/:id', authMiddleware, async (req: express.Request, res: express.Res
 // DELETE a user
 // Fix: Added types for req and res.
 // Fix: Used express.Request and express.Response types to avoid type conflicts.
-router.delete('/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: express.Request, res: express.Response) => {
     const { id } = req.params;
     try {
         await prisma.user.delete({ where: { id } });

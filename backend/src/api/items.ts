@@ -1,15 +1,15 @@
 // Fix: Use ES module import for Express.
-import { Router, Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authMiddleware, AuthRequest } from '../middleware/auth';
+import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
-const router = Router();
+const router = express.Router();
 const prisma = new PrismaClient();
 
-// GET all items
+// GET all items - accessible by all authenticated users
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const items = await prisma.item.findMany({ 
             // include: { media: true },
@@ -22,10 +22,10 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     }
 });
 
-// POST a new item
+// POST a new item - Administrator & Input Data
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { ...itemData } = req.body;
     // active field is replaced by status
     delete itemData.active;
@@ -49,10 +49,10 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     }
 });
 
-// PUT to update an item
+// PUT to update an item - Administrator & Input Data
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
      // remove fields that shouldn't be updated directly
@@ -78,10 +78,10 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     }
 });
 
-// DELETE an item
+// DELETE an item - Administrator only
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     try {
         // In a real app, you might need to handle related records first
@@ -93,10 +93,10 @@ router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) =>
     }
 });
 
-// POST to adjust stock
+// POST to adjust stock - Administrator & Input Data
 // Fix: Added types for req and res.
 // Fix: Used express.Response to avoid type conflicts.
-router.post('/:id/adjust', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;
     const userId = req.user?.userId;

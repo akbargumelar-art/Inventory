@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { DashboardIcon, BoxIcon, ClipboardListIcon, UsersIcon, PlusIcon } from '../../constants/icons';
 import ItemFormModal from '../items/ItemFormModal';
 import { useData } from '../../hooks/useData';
+import { useAuth } from '../../hooks/useAuth';
 import { Item } from '../../types';
 import toast from 'react-hot-toast';
 
@@ -18,6 +19,7 @@ const navLinks = [
 const BottomNavBar: React.FC = () => {
     const [isItemFormOpen, setIsItemFormOpen] = useState(false);
     const { addItem } = useData();
+    const { user } = useAuth();
 
     const handleSaveItem = (item: Item) => {
         addItem(item);
@@ -58,7 +60,11 @@ const BottomNavBar: React.FC = () => {
                 </div>
 
                 <NavItem {...navLinks[2]} />
-                <NavItem {...navLinks[3]} />
+                {user?.role === 'Administrator' ? (
+                  <NavItem {...navLinks[3]} />
+                ) : (
+                  <div className="w-1/5" />
+                )}
                 </div>
             </div>
             {isItemFormOpen && (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Location } from '../types';
 import { useData } from '../hooks/useData';
+import { useAuth } from '../hooks/useAuth';
 import { PencilIcon, TrashIcon } from '../constants/icons';
 import LocationFormModal from '../components/locations/LocationFormModal';
 import ConfirmationModal from '../components/common/ConfirmationModal';
@@ -8,10 +9,14 @@ import toast from 'react-hot-toast';
 
 const LocationsPage: React.FC = () => {
   const { locations, addLocation, updateLocation, deleteLocation } = useData();
+  const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [locationToDelete, setLocationToDelete] = useState<Location | null>(null);
+
+  const canEdit = user?.role === 'Administrator' || user?.role === 'Input Data';
+  const isAdmin = user?.role === 'Administrator';
 
   const handleAdd = () => {
     setSelectedLocation(null);
@@ -54,12 +59,14 @@ const LocationsPage: React.FC = () => {
         <h2 className="text-2xl font-semibold text-gray-700">
           Manajemen Lokasi
         </h2>
-        <button
-          onClick={handleAdd}
-          className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none"
-        >
-          Tambah Lokasi
-        </button>
+        {canEdit && (
+          <button
+            onClick={handleAdd}
+            className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none"
+          >
+            Tambah Lokasi
+          </button>
+        )}
       </div>
 
       <div className="w-full overflow-hidden rounded-lg shadow-xs">
@@ -70,7 +77,7 @@ const LocationsPage: React.FC = () => {
                 <th className="px-4 py-3">Nama Lokasi</th>
                 <th className="px-4 py-3">Kode</th>
                 <th className="px-4 py-3">Alamat</th>
-                <th className="px-4 py-3">Aksi</th>
+                {canEdit && <th className="px-4 py-3">Aksi</th>}
               </tr>
             </thead>
             <tbody className="bg-white divide-y">
@@ -79,16 +86,20 @@ const LocationsPage: React.FC = () => {
                   <td className="px-4 py-3 text-sm font-semibold">{loc.name}</td>
                   <td className="px-4 py-3 text-sm">{loc.code}</td>
                   <td className="px-4 py-3 text-sm">{loc.address}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center space-x-2 text-sm">
-                      <button onClick={() => handleEdit(loc)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Edit">
-                        <PencilIcon />
-                      </button>
-                      <button onClick={() => handleDelete(loc)} className="p-2 text-red-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Delete">
-                        <TrashIcon />
-                      </button>
-                    </div>
-                  </td>
+                  {canEdit && (
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2 text-sm">
+                        <button onClick={() => handleEdit(loc)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Edit">
+                          <PencilIcon />
+                        </button>
+                        {isAdmin && (
+                          <button onClick={() => handleDelete(loc)} className="p-2 text-red-500 rounded-md hover:bg-gray-100 focus:outline-none" aria-label="Delete">
+                            <TrashIcon />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

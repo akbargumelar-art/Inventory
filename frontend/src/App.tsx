@@ -13,6 +13,7 @@ import BorrowingsPage from './pages/BorrowingsPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
 import { Toaster } from 'react-hot-toast';
 
 const App: React.FC = () => {
@@ -33,7 +34,14 @@ const App: React.FC = () => {
                         <Route path="/items" element={<ItemsPage />} />
                         <Route path="/locations" element={<LocationsPage />} />
                         <Route path="/categories" element={<CategoriesPage />} />
-                        <Route path="/users" element={<UsersPage />} />
+                        <Route 
+                          path="/users" 
+                          element={
+                            <AdminRoute>
+                              <UsersPage />
+                            </AdminRoute>
+                          } 
+                        />
                         <Route path="/borrowings" element={<BorrowingsPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/" element={<DashboardPage />} />

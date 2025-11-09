@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSidebar } from '../../hooks/useSidebar';
+import { useAuth } from '../../hooks/useAuth';
 import { DashboardIcon, BoxIcon, ClipboardListIcon, UsersIcon, LocationIcon, CategoryIcon, InventoryIcon } from '../../constants/icons';
 
 const navLinks = [
@@ -37,6 +38,7 @@ const NavItem: React.FC<{ to: string; icon: React.FC<any>; text: string; isSideb
 
 const Sidebar: React.FC = () => {
   const { isSidebarOpen, openSidebar, closeSidebar } = useSidebar();
+  const { user } = useAuth();
   const sidebarRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -52,6 +54,13 @@ const Sidebar: React.FC = () => {
     };
   }, [isSidebarOpen, closeSidebar]);
 
+  const availableNavLinks = navLinks.filter(link => {
+    if (link.to === '/users') {
+        return user?.role === 'Administrator';
+    }
+    return true;
+  });
+
   return (
     <aside ref={sidebarRef} className={`relative z-40 flex-shrink-0 hidden md:flex flex-col bg-white transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-40' : 'w-16'}`}>
       <div className="py-4 text-gray-500 flex-grow">
@@ -63,7 +72,7 @@ const Sidebar: React.FC = () => {
             <span className={`font-bold text-gray-800 overflow-hidden whitespace-nowrap transition-all duration-200 ${isSidebarOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'}`}>InventoriApp</span>
         </div>
         <ul className="mt-6">
-          {navLinks.map(link => (
+          {availableNavLinks.map(link => (
             <NavItem key={link.to} {...link} isSidebarOpen={isSidebarOpen} openSidebar={openSidebar} />
           ))}
         </ul>
