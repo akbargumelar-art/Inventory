@@ -1,7 +1,7 @@
-// Fix: Use `require` to conform to the CommonJS module system used by the project.
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
-const { exit } = require('process');
+// Fix: Changed require to import for ES module consistency.
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+import { exit } from 'process';
 
 const prisma = new PrismaClient();
 

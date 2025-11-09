@@ -15,13 +15,13 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = await login(username, password);
-    if (success) {
+    const result = await login(username, password);
+    if (result.success) {
       toast.success('Login berhasil!');
       navigate('/dashboard');
     } else {
-      setError('Username atau password salah.');
-      toast.error('Username atau password salah.');
+      setError(result.message);
+      toast.error(result.message);
     }
   };
 
