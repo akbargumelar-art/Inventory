@@ -1,5 +1,6 @@
 # Stage 1: Build the application
-FROM node:20-alpine AS builder
+# Use a specific Alpine version that has the required openssl compatibility package
+FROM node:20-alpine3.18 AS builder
 
 WORKDIR /usr/src/app
 
@@ -20,7 +21,8 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Create the final production image
-FROM node:20-alpine
+# Use the same specific Alpine version
+FROM node:20-alpine3.18
 
 # --- FINAL FIX: Install OpenSSL 1.1 compatibility library required by Prisma ---
 RUN apk add --no-cache openssl1.1-compat
