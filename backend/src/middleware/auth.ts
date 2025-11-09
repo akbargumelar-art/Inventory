@@ -1,15 +1,12 @@
-// Fix: Use default import for express to avoid type conflicts.
-// FIX: import Request, Response, NextFunction types from express
-import { Request, Response, NextFunction } from 'express';
+// Fix: Use `import type` for express types to resolve type conflicts.
+import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 // Fix: Redefined AuthRequest to extend the imported express.Request type.
-// FIX: use imported Request type
 export type AuthRequest = Request & {
   user?: { userId: string; role: string };
 };
 
-// FIX: use imported Response and NextFunction types
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
@@ -29,7 +26,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 };
 
 export const authorize = (roles: string[]) => {
-  // FIX: use imported Response and NextFunction types
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });

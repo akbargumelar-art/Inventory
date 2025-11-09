@@ -1,18 +1,16 @@
-// Fix: Use default import for express to avoid type conflicts with global Response type.
-// FIX: import Response type from express
-import express, { Response } from 'express';
+// Fix: Separate default and type imports for express to resolve type conflicts.
+import express from 'express';
+import type { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
 const { PrismaClient } = require('@prisma/client');
-// Fix: Import Prisma types directly to resolve module resolution issues.
-// FIX: use `import type` for prisma types
-import { Prisma, Item } from '@prisma/client';
+// Fix: Use `import type` for Prisma types to resolve module resolution issues.
+import type { Prisma, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all items - accessible by all authenticated users
-// FIX: use imported Response type
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const items = await prisma.item.findMany({ 
@@ -27,7 +25,6 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new item - Administrator & Input Data
-// FIX: use imported Response type
 router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { ...itemData } = req.body;
     // active field is replaced by status
@@ -53,7 +50,6 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update an item - Administrator & Input Data
-// FIX: use imported Response type
 router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
@@ -81,7 +77,6 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE an item - Administrator only
-// FIX: use imported Response type
 router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
@@ -95,7 +90,6 @@ router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: 
 });
 
 // POST to adjust stock - Administrator & Input Data
-// FIX: use imported Response type
 router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;

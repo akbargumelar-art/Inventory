@@ -1,6 +1,6 @@
-// Fix: Use default import for express to avoid type conflicts with global Response type.
-// FIX: import Response type from express
-import express, { Response } from 'express';
+// Fix: Separate default and type imports for express to resolve type conflicts.
+import express from 'express';
+import type { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
 const { PrismaClient } = require('@prisma/client');
 import { authMiddleware, authorize, AuthRequest } from '../middleware/auth';
@@ -9,7 +9,6 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all categories
-// FIX: use imported Response type
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const categories = await prisma.category.findMany({ orderBy: { name: 'asc' }});
@@ -20,7 +19,6 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new category
-// FIX: use imported Response type
 router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { name, parentId } = req.body;
     try {
@@ -34,7 +32,6 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update a category
-// FIX: use imported Response type
 router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { name, parentId } = req.body;
@@ -50,7 +47,6 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE a category
-// FIX: use imported Response type
 router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {

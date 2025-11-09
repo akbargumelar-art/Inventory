@@ -3,14 +3,14 @@ FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
 
-# Copy package files and install dependencies
+# Copy package files and install all dependencies for build
 COPY package*.json ./
 RUN npm install
 
 # Copy prisma schema
 COPY prisma ./prisma/
 
-# Generate Prisma Client
+# Generate Prisma Client to be used during the build process
 RUN npx prisma generate
 
 # Copy the rest of the source code
@@ -19,23 +19,29 @@ COPY . .
 # Build TypeScript to JavaScript
 RUN npm run build
 
-# Stage 2: Create the production image
+# Stage 2: Create the final production image
 FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Copy package files and install only production dependencies
+# Copy package files
 COPY package*.json ./
+
+# Install ONLY production dependencies first
 RUN npm install --omit=dev
 
-# --- FIX: Copy the generated Prisma Client from the builder stage ---
-COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+# We still need the prisma CLI in the final image to run 'generate'
+RUN npm install prisma
 
-# Copy the built application from the builder stage
-COPY --from=builder /usr/src/app/dist ./dist
-
-# Copy the prisma schema for runtime
+# Copy the prisma schema
 COPY --from=builder /usr/src/app/prisma ./prisma
+
+# --- FINAL FIX: Generate Prisma Client AGAIN in the final stage ---
+# This ensures the correct binary engine is available for the production environment.
+RUN npx prisma generate
+
+# Copy the compiled JavaScript code from the builder stage
+COPY --from=builder /usr/src/app/dist ./dist
 
 # Expose the port the app runs on
 EXPOSE 6001

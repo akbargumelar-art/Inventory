@@ -1,18 +1,16 @@
-// Fix: Use default import for express to avoid type conflicts with global Response type.
-// FIX: import Response type from express
-import express, { Response } from 'express';
+// Fix: Separate default and type imports for express to resolve type conflicts.
+import express from 'express';
+import type { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
 const { PrismaClient } = require('@prisma/client');
-// Fix: Import Prisma types directly to resolve module resolution issues.
-// FIX: use `import type` for prisma types
-import { StockHistory, User } from '@prisma/client';
+// Fix: Use `import type` for Prisma types to resolve module resolution issues.
+import type { StockHistory, User } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all stock history
-// FIX: use imported Response type
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const history = await prisma.stockHistory.findMany({
