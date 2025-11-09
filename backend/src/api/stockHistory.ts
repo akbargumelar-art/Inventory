@@ -1,8 +1,7 @@
-import express from 'express';
-// Fix: Use regular import for express Response type.
-import { Response } from 'express';
+import express, { Response } from 'express';
 // Fix: Import Prisma types along with PrismaClient.
-import { PrismaClient, StockHistory as StockHistoryType, User as UserType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { StockHistory as StockHistoryType, User as UserType } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
@@ -33,7 +32,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
         const formattedHistory = history.map((h) => ({
             id: h.id,
             timestamp: h.timestamp.toISOString(),
-            user: h.user,
+            user: h.user as UserType, // Cast to UserType to match frontend type
             type: h.type,
             quantityChange: h.quantityChange,
             fromLocation: null, // Placeholder, as location is not tracked in this model

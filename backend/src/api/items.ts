@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Response } from 'express';
 // Fix: Use regular import for express Response type.
-import { Response } from 'express';
 // Fix: Import Item type from Prisma client along with PrismaClient.
-import { PrismaClient, Item } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();

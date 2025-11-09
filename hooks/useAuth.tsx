@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User } from '../types';
-import { apiClient } from '../services/apiClient';
+import { apiClient, ApiError } from '../services/apiClient';
 
 interface AuthState {
   token: string | null;
@@ -10,7 +10,7 @@ interface AuthState {
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (username: string, password?: string) => Promise<boolean>;
+  login: (username: string, password?: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   updateProfile: (updatedData: Partial<User>) => Promise<void>;
 }
@@ -28,19 +28,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const login = async (username: string, password?: string): Promise<boolean> => {
+  const login = async (username: string, password?: string): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await apiClient.post<{ token: string; user: User }>('/auth/login', { username, password });
       if (response.token && response.user) {
         const authData = { token: response.token, user: response.user };
         setAuth(authData);
         sessionStorage.setItem('auth', JSON.stringify(authData));
-        return true;
+        return { success: true, message: 'Login berhasil!' };
       }
-      return false;
+      return { success: false, message: 'Gagal login, respon tidak valid dari server.' };
     } catch (error) {
       console.error("Login failed:", error);
-      return false;
+       if (error instanceof ApiError) {
+          if (error.status >= 500) {
+              return { success: false, message: `Server sedang bermasalah. Silakan coba lagi nanti. (${error.message})` };
+          }
+          if (error.status === 401 || error.status === 400) {
+              return { success: false, message: 'Username atau password salah.' };
+          }
+      }
+      return { success: false, message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.' };
     }
   };
 

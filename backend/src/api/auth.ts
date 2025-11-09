@@ -1,6 +1,4 @@
-import express from 'express';
-// Fix: Use regular import for express types to fix typing issues.
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -12,11 +10,11 @@ const prisma = new PrismaClient();
 router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password are required' });
-  }
-
   try {
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+
     const user = await prisma.user.findUnique({ where: { username } });
 
     if (!user) {
@@ -30,7 +28,8 @@ router.post('/login', async (req: Request, res: Response) => {
     
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-        throw new Error("JWT_SECRET is not defined in the environment variables.");
+        console.error("FATAL: JWT_SECRET is not defined in the environment variables.");
+        throw new Error("JWT_SECRET is not configured on the server.");
     }
 
     const token = jwt.sign(
@@ -44,9 +43,16 @@ router.post('/login', async (req: Request, res: Response) => {
     res.json({ token, user: userWithoutPassword });
 
   } catch (error) {
-    console.error('Login error:', error); // <-- LOGGING DETAIL ERROR
+    // SUPER DETAILED LOGGING FOR FINAL DIAGNOSIS
+    console.error("========================================");
+    console.error("FATAL ERROR DURING LOGIN PROCESS:");
+    console.error("Timestamp:", new Date().toISOString());
+    console.error("Request Body:", { username: req.body.username, password: '[REDACTED]' }); // Redact password from logs
+    console.error("Full Error Object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    console.error("========================================");
+    
     const err = error as Error;
-    res.status(500).json({ message: 'Error logging in', error: err.message });
+    res.status(500).json({ message: 'Internal Server Error', error: err.message });
   }
 });
 

@@ -1,5 +1,18 @@
 const API_BASE_URL = 'http://localhost:6001/api';
 
+export class ApiError extends Error {
+    status: number;
+    details?: any;
+
+    constructor(message: string, status: number, details?: any) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+        this.details = details;
+    }
+}
+
+
 const getAuthToken = (): string | null => {
     const authData = sessionStorage.getItem('auth');
     if (authData) {
@@ -44,8 +57,8 @@ async function request<T>(endpoint: string, method: string, body?: any): Promise
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: response.statusText }));
-        throw new Error(errorData.message || 'An API error occurred');
+        const errorData = await response.json().catch(() => ({ message: response.statusText, error: "No JSON body" }));
+        throw new ApiError(errorData.message || 'An API error occurred', response.status, errorData.error);
     }
 
     if (method === 'DELETE' && response.status === 204) {

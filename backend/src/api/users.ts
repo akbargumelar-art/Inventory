@@ -1,6 +1,4 @@
-import express from 'express';
-// Fix: Use regular import for express Response type.
-import { Response } from 'express';
+import express, { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, authorize, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';

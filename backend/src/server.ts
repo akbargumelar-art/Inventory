@@ -1,6 +1,4 @@
-import express from 'express';
-// Fix: Use regular import for express types to fix typing issues with Request, Response objects.
-import { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './api/auth';
