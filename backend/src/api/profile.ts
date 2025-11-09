@@ -1,5 +1,6 @@
-import express, { Response } from 'express';
-// Fix: Use direct import for PrismaClient to resolve module issues.
+import express from 'express';
+// Fix: Use regular import for express Response type.
+import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
@@ -8,7 +9,6 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET current user's profile
-// Fix: Use Response for correct type.
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
     try {
@@ -26,7 +26,6 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // PUT to update current user's profile
-// Fix: Use Response for correct type.
 router.put('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
     const { name, email, password } = req.body; // username is not updatable from profile

@@ -1,5 +1,6 @@
-import express, { Response } from 'express';
-// Fix: Use direct import for PrismaClient to resolve module issues.
+import express from 'express';
+// Fix: Use regular import for express Response type.
+import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
@@ -7,7 +8,6 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all borrowings
-// Fix: Use Response for correct type.
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const borrowings = await prisma.borrowing.findMany({ orderBy: { borrowDate: 'desc' }});
@@ -18,7 +18,6 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new borrowing
-// Fix: Use Response for correct type.
 router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { itemId, borrowerName, borrowDate, expectedReturnDate, notes } = req.body;
     const userId = req.user?.userId;
@@ -28,7 +27,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
     }
 
     try {
-        const result = await prisma.$transaction(async (tx: any) => {
+        const result = await prisma.$transaction(async (tx) => {
             // Decrease stock
             const updatedItem = await tx.item.update({
                 where: { id: itemId },
@@ -72,7 +71,6 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to return a borrowing
-// Fix: Use Response for correct type.
 router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
@@ -82,7 +80,7 @@ router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Dat
     }
 
     try {
-        const result = await prisma.$transaction(async (tx: any) => {
+        const result = await prisma.$transaction(async (tx) => {
             const borrowing = await tx.borrowing.findUnique({ where: { id } });
             if (!borrowing || borrowing.status === 'Kembali') {
                 throw new Error("Borrowing record not found or already returned.");

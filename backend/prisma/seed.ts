@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
@@ -14,6 +15,7 @@ async function main() {
     where: { username: 'admin' },
     update: { password: adminPassword },
     create: {
+      id: 'clx_user_admin_001',
       username: 'admin',
       email: 'admin@inventory.com',
       name: 'Admin Utama',
@@ -26,6 +28,7 @@ async function main() {
     where: { username: 'akbar' },
     update: { password: akbarPassword },
     create: {
+      id: 'clx_user_akbar_002',
       username: 'akbar',
       email: 'akbar@inventory.com',
       name: 'Akbar',

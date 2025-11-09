@@ -1,13 +1,14 @@
-import express, { Response } from 'express';
-// Fix: Use direct import for PrismaClient and model types to resolve module issues.
-import { PrismaClient, StockHistory, User } from '@prisma/client';
+import express from 'express';
+// Fix: Use regular import for express Response type.
+import { Response } from 'express';
+// Fix: Import Prisma types along with PrismaClient.
+import { PrismaClient, StockHistory as StockHistoryType, User as UserType } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all stock history
-// Fix: Use Response for correct type.
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const history = await prisma.stockHistory.findMany({
@@ -23,14 +24,13 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
             }
         });
         
-        // Fix: Use imported StockHistory and User types.
-        type HistoryRecord = StockHistory & {
-            user: Partial<User>;
+        type HistoryRecord = StockHistoryType & {
+            user: Partial<UserType>;
             item: { id: string; name: string; sku: string; };
         };
 
         // Map to frontend-compatible structure
-        const formattedHistory = history.map((h: HistoryRecord) => ({
+        const formattedHistory = history.map((h) => ({
             id: h.id,
             timestamp: h.timestamp.toISOString(),
             user: h.user,

@@ -1,5 +1,7 @@
-import express, { Response } from 'express';
-// Fix: Use direct import for PrismaClient and model types to resolve module issues.
+import express from 'express';
+// Fix: Use regular import for express Response type.
+import { Response } from 'express';
+// Fix: Import Item type from Prisma client along with PrismaClient.
 import { PrismaClient, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
@@ -7,28 +9,22 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all items - accessible by all authenticated users
-// Fix: Use Response for correct typing.
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const items = await prisma.item.findMany({ 
-            // include: { media: true },
             orderBy: { createdAt: 'desc' }
         });
-        // Return empty media array for now as media upload is not implemented.
-        // Fix: Use imported Item type.
         res.json(items.map((item: Item) => ({...item, media: []}))); 
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching items', error });
+        const err = error as Error;
+        res.status(500).json({ message: 'Error fetching items', error: err.message });
     }
 });
 
 // POST a new item - Administrator & Input Data
-// Fix: Use Response for correct typing.
 router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { ...itemData } = req.body;
-    // active field is replaced by status
     delete itemData.active;
-     // remove id if it's sent for creation
     delete itemData.id;
     try {
         const newItem = await prisma.item.create({
@@ -49,11 +45,9 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update an item - Administrator & Input Data
-// Fix: Use Response for correct typing.
 router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
-     // remove fields that shouldn't be updated directly
     delete itemData.id;
     delete itemData.sku;
     delete itemData.barcode;
@@ -77,11 +71,9 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE an item - Administrator only
-// Fix: Use Response for correct typing.
 router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
-        // In a real app, you might need to handle related records first
         await prisma.item.delete({ where: { id } });
         res.status(204).send();
     } catch (error) {
@@ -91,7 +83,6 @@ router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: 
 });
 
 // POST to adjust stock - Administrator & Input Data
-// Fix: Use Response for correct typing.
 router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;
@@ -103,7 +94,7 @@ router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Da
 
     try {
         let newHistory;
-        const updatedItem = await prisma.$transaction(async (tx: any) => {
+        const updatedItem = await prisma.$transaction(async (tx) => {
             const item = await tx.item.update({
                 where: { id },
                 data: {
@@ -127,7 +118,6 @@ router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Da
             return item;
         });
 
-        // Return both the updated item and the new history record.
         res.json({ updatedItem: {...updatedItem, media: []}, newHistory });
     } catch (error) {
         const err = error as Error;

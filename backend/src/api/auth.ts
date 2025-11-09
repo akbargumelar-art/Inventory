@@ -1,5 +1,6 @@
-import express, { Request, Response } from 'express';
-// Fix: Use direct import for PrismaClient to resolve type errors.
+import express from 'express';
+// Fix: Use regular import for express types to fix typing issues.
+import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -8,7 +9,6 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/auth/login
-// Fix: Use Request and Response for correct typing of route handlers.
 router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
@@ -28,9 +28,14 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error("JWT_SECRET is not defined in the environment variables.");
+    }
+
     const token = jwt.sign(
       { userId: user.id, role: user.role },
-      process.env.JWT_SECRET as string,
+      secret,
       { expiresIn: '1d' }
     );
 
@@ -39,7 +44,9 @@ router.post('/login', async (req: Request, res: Response) => {
     res.json({ token, user: userWithoutPassword });
 
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error });
+    console.error('Login error:', error); // <-- LOGGING DETAIL ERROR
+    const err = error as Error;
+    res.status(500).json({ message: 'Error logging in', error: err.message });
   }
 });
 

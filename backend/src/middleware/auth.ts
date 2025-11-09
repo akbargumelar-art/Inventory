@@ -1,13 +1,11 @@
+// Fix: Use regular import for express types.
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-// Fix: Changed interface to a type intersection to resolve handler signature compatibility issues.
-// Fix: Use express.Request to ensure correct base type.
 export type AuthRequest = Request & {
   user?: { userId: string; role: string };
 };
 
-// Fix: Use Response and NextFunction for correct types.
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
@@ -27,7 +25,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 };
 
 export const authorize = (roles: string[]) => {
-  // Fix: Use Response and NextFunction for correct types.
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
