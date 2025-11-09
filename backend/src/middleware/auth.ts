@@ -1,11 +1,9 @@
-
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import express from 'express';
 
 // Fix: Changed interface to a type intersection to resolve handler signature compatibility issues.
 // Fix: Use express.Request to ensure correct base type.
-export type AuthRequest = express.Request & {
+export type AuthRequest = Request & {
   user?: { userId: string; role: string };
 };
 

@@ -1,4 +1,3 @@
-
 import express, { Response } from 'express';
 // Fix: Use direct import for PrismaClient to resolve module issues.
 import { PrismaClient } from '@prisma/client';

@@ -1,4 +1,3 @@
-
 import express, { Response } from 'express';
 // Fix: Use direct import for PrismaClient and model types to resolve module issues.
 import { PrismaClient, StockHistory, User } from '@prisma/client';

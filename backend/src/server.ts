@@ -16,6 +16,16 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 6001;
 
+// =========================================================
+//  DEBUGGING: Log environment variables to check if they are loaded
+// =========================================================
+console.log("--- Verifikasi Environment Variables ---");
+console.log(`DATABASE_URL: ${process.env.DATABASE_URL ? 'Loaded (Terbaca)' : 'NOT LOADED (TIDAK TERBACA)'}`);
+console.log(`JWT_SECRET: ${process.env.JWT_SECRET ? 'Loaded (Terbaca)' : 'NOT LOADED (TIDAK TERBACA)'}`);
+console.log("--------------------------------------");
+// =========================================================
+
+
 // Middleware
 app.use(cors());
 app.use(express.json());
