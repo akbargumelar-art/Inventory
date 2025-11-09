@@ -28,6 +28,9 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --omit=dev
 
+# --- FIX: Copy the generated Prisma Client from the builder stage ---
+COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+
 # Copy the built application from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
 

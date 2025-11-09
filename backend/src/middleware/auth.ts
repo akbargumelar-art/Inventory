@@ -1,6 +1,6 @@
 // Fix: Use default import for express to avoid type conflicts.
 // FIX: import Request, Response, NextFunction types from express
-import express, { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 // Fix: Redefined AuthRequest to extend the imported express.Request type.

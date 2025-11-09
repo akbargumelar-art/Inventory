@@ -5,7 +5,7 @@ import express, { Response } from 'express';
 const { PrismaClient } = require('@prisma/client');
 // Fix: Import Prisma types directly to resolve module resolution issues.
 // FIX: use `import type` for prisma types
-import type { Prisma, Item } from '@prisma/client';
+import { Prisma, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
