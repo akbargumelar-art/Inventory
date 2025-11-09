@@ -29,11 +29,9 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
     }
 
     try {
-        let newHistory;
-        let updatedItem: Item | undefined;
-        const newBorrowing = await prisma.$transaction(async (tx: any) => {
+        const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             // Decrease stock
-            updatedItem = await tx.item.update({
+            const updatedItem = await tx.item.update({
                 where: { id: itemId },
                 data: { stock: { decrement: 1 } },
             });
@@ -43,7 +41,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
             }
 
             // Create borrowing record
-            const borrowing = await tx.borrowing.create({
+            const newBorrowing = await tx.borrowing.create({
                 data: {
                     itemId,
                     userId,
@@ -54,7 +52,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
                 },
             });
             // Create stock history record
-            newHistory = await tx.stockHistory.create({
+            const newHistory = await tx.stockHistory.create({
                 data: {
                     itemId: itemId,
                     userId: userId,
@@ -65,9 +63,9 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
                  include: { user: { select: { id: true, name: true, email: true, role: true }}, item: { select: { id: true, name: true, sku: true }} }
             });
 
-            return borrowing;
+            return { newBorrowing, newHistory, updatedItem };
         });
-        res.status(201).json({ newBorrowing, newHistory, updatedItem: updatedItem ? {...updatedItem, media: []} : undefined });
+        res.status(201).json({ newBorrowing: result.newBorrowing, newHistory: result.newHistory, updatedItem: { ...result.updatedItem, media: [] } });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error creating borrowing record', error: err.message });
@@ -84,22 +82,20 @@ router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Dat
     }
 
     try {
-        let newHistory;
-        let updatedItem: Item | undefined;
-        const updatedBorrowing = await prisma.$transaction(async (tx: any) => {
+        const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             const borrowing = await tx.borrowing.findUnique({ where: { id } });
             if (!borrowing || borrowing.status === 'Kembali') {
                 throw new Error("Borrowing record not found or already returned.");
             }
 
             // Increase stock
-            updatedItem = await tx.item.update({
+            const updatedItem = await tx.item.update({
                 where: { id: borrowing.itemId },
                 data: { stock: { increment: 1 } },
             });
 
             // Create stock history record
-            newHistory = await tx.stockHistory.create({
+            const newHistory = await tx.stockHistory.create({
                 data: {
                     itemId: borrowing.itemId,
                     userId,
@@ -111,15 +107,17 @@ router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Dat
             });
 
             // Update borrowing status
-            return tx.borrowing.update({
+            const updatedBorrowing = await tx.borrowing.update({
                 where: { id },
                 data: {
                     status: 'Kembali',
                     actualReturnDate: new Date(),
                 },
             });
+            
+            return { updatedBorrowing, newHistory, updatedItem };
         });
-        res.json({ updatedBorrowing, newHistory, updatedItem: updatedItem ? {...updatedItem, media: []} : undefined });
+        res.json({ updatedBorrowing: result.updatedBorrowing, newHistory: result.newHistory, updatedItem: { ...result.updatedItem, media: [] } });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error returning item', error: err.message });
