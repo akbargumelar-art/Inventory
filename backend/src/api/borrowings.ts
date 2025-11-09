@@ -1,4 +1,4 @@
-// FIXED: File ini telah diperbaiki untuk mengatasi error build TypeScript.
+// Fix: Use ES module import for Express.
 import { Router, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
@@ -7,18 +7,20 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // GET all borrowings
+// Fix: Added types for req and res.
+// Fix: Used express.Response to avoid type conflicts.
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const borrowings = await prisma.borrowing.findMany({ orderBy: { borrowDate: 'desc' }});
         res.json(borrowings);
     } catch (error) {
-        const err = error as Error;
-        console.error("Error fetching borrowings: ", err);
-        res.status(500).json({ message: 'Error fetching borrowings', error: err.message });
+        res.status(500).json({ message: 'Error fetching borrowings', error });
     }
 });
 
 // POST a new borrowing
+// Fix: Added type for req.
+// Fix: Used express.Response to avoid type conflicts.
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { itemId, borrowerName, borrowDate, expectedReturnDate, notes } = req.body;
     const userId = req.user?.userId;
@@ -29,8 +31,10 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 
     try {
         let newHistory;
-        const result = await prisma.$transaction(async (tx) => {
-            const updatedItem = await tx.item.update({
+        let updatedItem;
+        const newBorrowing = await prisma.$transaction(async (tx) => {
+            // Decrease stock
+            updatedItem = await tx.item.update({
                 where: { id: itemId },
                 data: { stock: { decrement: 1 } },
             });
@@ -39,6 +43,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
                 throw new Error("Stok tidak mencukupi.");
             }
 
+            // Create borrowing record
             const borrowing = await tx.borrowing.create({
                 data: {
                     itemId,
@@ -49,7 +54,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
                     notes,
                 },
             });
-
+            // Create stock history record
             newHistory = await tx.stockHistory.create({
                 data: {
                     itemId: itemId,
@@ -61,11 +66,9 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
                  include: { user: { select: { id: true, name: true, email: true, role: true }}, item: { select: { id: true, name: true, sku: true }} }
             });
 
-            return { borrowing, updatedItem };
+            return borrowing;
         });
-        
-        const { borrowing, updatedItem } = result;
-        res.status(201).json({ newBorrowing: borrowing, newHistory, updatedItem: {...updatedItem, media: []} });
+        res.status(201).json({ newBorrowing, newHistory, updatedItem: {...updatedItem, media: []} });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error creating borrowing record', error: err.message });
@@ -73,6 +76,8 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // PUT to return a borrowing
+// Fix: Added types for req and res.
+// Fix: Used express.Response to avoid type conflicts.
 router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
@@ -83,17 +88,20 @@ router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response
 
     try {
         let newHistory;
-        const result = await prisma.$transaction(async (tx) => {
+        let updatedItem;
+        const updatedBorrowing = await prisma.$transaction(async (tx) => {
             const borrowing = await tx.borrowing.findUnique({ where: { id } });
             if (!borrowing || borrowing.status === 'Kembali') {
                 throw new Error("Borrowing record not found or already returned.");
             }
 
-            const updatedItem = await tx.item.update({
+            // Increase stock
+            updatedItem = await tx.item.update({
                 where: { id: borrowing.itemId },
                 data: { stock: { increment: 1 } },
             });
 
+            // Create stock history record
             newHistory = await tx.stockHistory.create({
                 data: {
                     itemId: borrowing.itemId,
@@ -105,23 +113,21 @@ router.put('/:id/return', authMiddleware, async (req: AuthRequest, res: Response
                 include: { user: { select: { id: true, name: true, email: true, role: true }}, item: { select: { id: true, name: true, sku: true }} }
             });
 
-            const updatedBorrowing = await tx.borrowing.update({
+            // Update borrowing status
+            return tx.borrowing.update({
                 where: { id },
                 data: {
                     status: 'Kembali',
                     actualReturnDate: new Date(),
                 },
             });
-
-            return { updatedBorrowing, updatedItem };
         });
-
-        const { updatedBorrowing, updatedItem } = result;
         res.json({ updatedBorrowing, newHistory, updatedItem: {...updatedItem, media: []} });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error returning item', error: err.message });
     }
 });
+
 
 export default router;

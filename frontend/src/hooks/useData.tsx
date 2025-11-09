@@ -142,7 +142,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Borrowings
     const addBorrowing = async (borrowing: Partial<Borrowing>) => {
         const { newBorrowing, newHistory, updatedItem } = await apiClient.post<{newBorrowing: Borrowing, newHistory: StockHistory, updatedItem: Item}>('/borrowings', borrowing);
-        setBorrowings(prev => [newBorrowing, ...prev]);
+        setBorrowings(prev => [newBorrowing, ...prev].sort((a, b) => new Date(b.borrowDate).getTime() - new Date(a.borrowDate).getTime()));
         setStockHistory(prev => [newHistory, ...prev]);
         setItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
     };
