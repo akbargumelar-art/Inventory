@@ -1,5 +1,5 @@
 
-import express from 'express';
+import express, { Response } from 'express';
 // Fix: Use direct import for PrismaClient and model types to resolve module issues.
 import { PrismaClient, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
@@ -8,8 +8,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all items - accessible by all authenticated users
-// Fix: Use express.Response for correct typing.
-router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct typing.
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const items = await prisma.item.findMany({ 
             // include: { media: true },
@@ -24,8 +24,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) 
 });
 
 // POST a new item - Administrator & Input Data
-// Fix: Use express.Response for correct typing.
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct typing.
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { ...itemData } = req.body;
     // active field is replaced by status
     delete itemData.active;
@@ -50,8 +50,8 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update an item - Administrator & Input Data
-// Fix: Use express.Response for correct typing.
-router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct typing.
+router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
      // remove fields that shouldn't be updated directly
@@ -78,8 +78,8 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE an item - Administrator only
-// Fix: Use express.Response for correct typing.
-router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct typing.
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
         // In a real app, you might need to handle related records first
@@ -92,8 +92,8 @@ router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: 
 });
 
 // POST to adjust stock - Administrator & Input Data
-// Fix: Use express.Response for correct typing.
-router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct typing.
+router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;
     const userId = req.user?.userId;

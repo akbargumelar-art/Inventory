@@ -1,5 +1,5 @@
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 // Fix: Use direct import for PrismaClient to resolve type errors.
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -9,8 +9,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/auth/login
-// Fix: Use express.Request and express.Response for correct typing of route handlers.
-router.post('/login', async (req: express.Request, res: express.Response) => {
+// Fix: Use Request and Response for correct typing of route handlers.
+router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {

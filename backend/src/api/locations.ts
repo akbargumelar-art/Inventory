@@ -1,5 +1,5 @@
 
-import express from 'express';
+import express, { Response } from 'express';
 // Fix: Use direct import for PrismaClient to resolve module issues.
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, authorize, AuthRequest } from '../middleware/auth';
@@ -8,8 +8,8 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all locations
-// Fix: Use express.Response for correct type.
-router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct type.
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     try {
         const locations = await prisma.location.findMany({ orderBy: { name: 'asc' }});
         res.json(locations);
@@ -19,8 +19,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) 
 });
 
 // POST a new location
-// Fix: Use express.Response for correct type.
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct type.
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { name, code, address, description } = req.body;
     try {
         const newLocation = await prisma.location.create({
@@ -33,8 +33,8 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update a location
-// Fix: Use express.Response for correct type.
-router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct type.
+router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { name, code, address, description } = req.body;
     try {
@@ -49,8 +49,8 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE a location
-// Fix: Use express.Response for correct type.
-router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: express.Response) => {
+// Fix: Use Response for correct type.
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     try {
         await prisma.location.delete({ where: { id } });
