@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(Viewer)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stockHistory StockHistory[]
+  borrowings   Borrowing[]
+}
+
+model Item {
+  id                String       @id @default(cuid())
+  sku               String       @unique
+  barcode           String       @unique
+  name              String
+  description       String?      @db.Text
+  categoryId        String
+  defaultLocationId String
+  unit              UnitType
+  stock             Int          @default(0)
+  minStock          Int          @default(10)
+  price             Float
+  currency          String       @default("IDR")
+  status            ItemStatus   @default(Aktif)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  category         Category       @relation(fields: [categoryId], references: [id])
+  defaultLocation  Location       @relation(fields: [defaultLocationId], references: [id])
+  stockHistory     StockHistory[]
+  borrowings       Borrowing[]
+}
+
+model Location {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  name        String
+  address     String?
+  description String?
+  items       Item[]
+}
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  parentId String?
+  parent   Category?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children Category[] @relation("ParentChild")
+  items    Item[]
+}
+
+model StockHistory {
+  id             String         @id @default(cuid())
+  timestamp      DateTime       @default(now())
+  userId         String
+  itemId         String
+  type           HistoryType
+  quantityChange Int
+  reason         String?
+  
+  user User @relation(fields: [userId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
+}
+
+model Borrowing {
+  id                 String          @id @default(cuid())
+  userId             String
+  itemId             String
+  borrowerName       String
+  borrowDate         DateTime
+  expectedReturnDate DateTime
+  actualReturnDate   DateTime?
+  status             BorrowingStatus @default(Dipinjam)
+  notes              String?
+  
+  user User @relation(fields: [userId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
+}
+
+enum UserRole {
+  Administrator
+  InputData
+  Viewer
+}
+
+enum UnitType {
+  pcs
+  kg
+  liter
+  meter
+}
+
+enum ItemStatus {
+  Aktif
+  NonAktif
+  Baik
+  Rusak
+}
+
+enum HistoryType {
+  Penerimaan
+  Penjualan
+  Transfer
+  Koreksi
+  Retur
+  Dipinjamkan
+  Dikembalikan
+  Dijual
+  Hilang
+  Diberikan
+}
+
+enum BorrowingStatus {
+  Dipinjam
+  Kembali
+}
