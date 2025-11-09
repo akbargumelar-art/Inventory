@@ -1,13 +1,15 @@
-import express, { Response } from 'express';
-// Fix: Use namespace import for Prisma Client to resolve module issues.
-import * as Prisma from '@prisma/client';
+
+import express from 'express';
+// Fix: Use direct import for PrismaClient to resolve module issues.
+import { PrismaClient } from '@prisma/client';
 import { authMiddleware, authorize, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
-const prisma = new Prisma.PrismaClient();
+const prisma = new PrismaClient();
 
 // GET all categories
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const categories = await prisma.category.findMany({ orderBy: { name: 'asc' }});
         res.json(categories);
@@ -17,7 +19,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new category
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { name, parentId } = req.body;
     try {
         const newCategory = await prisma.category.create({
@@ -30,7 +33,8 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update a category
-router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const { name, parentId } = req.body;
     try {
@@ -45,7 +49,8 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE a category
-router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     try {
         await prisma.category.delete({ where: { id } });

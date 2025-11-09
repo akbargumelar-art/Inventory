@@ -1,14 +1,16 @@
-import express, { Request, Response } from 'express';
-// Fix: Use namespace import for Prisma Client to resolve module issues.
-import * as Prisma from '@prisma/client';
+
+import express from 'express';
+// Fix: Use direct import for PrismaClient to resolve type errors.
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const router = express.Router();
-const prisma = new Prisma.PrismaClient();
+const prisma = new PrismaClient();
 
 // POST /api/auth/login
-router.post('/login', async (req: Request, res: Response) => {
+// Fix: Use express.Request and express.Response for correct typing of route handlers.
+router.post('/login', async (req: express.Request, res: express.Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {

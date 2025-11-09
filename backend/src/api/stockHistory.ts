@@ -1,13 +1,15 @@
-import express, { Response } from 'express';
-// Fix: Use namespace import for Prisma Client to resolve module issues.
-import * as Prisma from '@prisma/client';
+
+import express from 'express';
+// Fix: Use direct import for PrismaClient and model types to resolve module issues.
+import { PrismaClient, StockHistory, User } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
-const prisma = new Prisma.PrismaClient();
+const prisma = new PrismaClient();
 
 // GET all stock history
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const history = await prisma.stockHistory.findMany({
             orderBy: { timestamp: 'desc' },
@@ -22,8 +24,9 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
             }
         });
         
-        type HistoryRecord = Prisma.StockHistory & {
-            user: Partial<Prisma.User>;
+        // Fix: Use imported StockHistory and User types.
+        type HistoryRecord = StockHistory & {
+            user: Partial<User>;
             item: { id: string; name: string; sku: string; };
         };
 

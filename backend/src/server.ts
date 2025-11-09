@@ -1,5 +1,5 @@
 
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './api/auth';
@@ -32,12 +32,14 @@ app.use('/api/stock-history', stockHistoryRoutes);
 
 
 // Health Check
-app.get('/', (req: Request, res: Response) => {
+// Fix: Use express.Request and express.Response to ensure correct types.
+app.get('/', (req: express.Request, res: express.Response) => {
   res.send('Inventory Management API is running!');
 });
 
 // Global Error Handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+// Fix: Use express.Request, express.Response, and express.NextFunction to ensure correct types.
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });

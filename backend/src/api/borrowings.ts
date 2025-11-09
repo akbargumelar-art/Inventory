@@ -1,13 +1,15 @@
-import express, { Response } from 'express';
-// Fix: Use namespace import for Prisma Client to resolve module issues.
-import * as Prisma from '@prisma/client';
+
+import express from 'express';
+// Fix: Use direct import for PrismaClient to resolve module issues.
+import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
-const prisma = new Prisma.PrismaClient();
+const prisma = new PrismaClient();
 
 // GET all borrowings
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const borrowings = await prisma.borrowing.findMany({ orderBy: { borrowDate: 'desc' }});
         res.json(borrowings);
@@ -17,7 +19,8 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new borrowing
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { itemId, borrowerName, borrowDate, expectedReturnDate, notes } = req.body;
     const userId = req.user?.userId;
 
@@ -70,7 +73,8 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to return a borrowing
-router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+// Fix: Use express.Response for correct type.
+router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
 
