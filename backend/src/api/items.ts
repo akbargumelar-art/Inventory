@@ -1,8 +1,8 @@
-// Fix: Separated express import from type imports to resolve type conflicts.
-import express from 'express';
-import type { Response } from 'express';
+// Fix: Combined express default and type imports to resolve type conflicts.
+import express, { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
-const { PrismaClient, Prisma, Item } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
+import type { Prisma, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
