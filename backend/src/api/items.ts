@@ -1,9 +1,8 @@
-
 // Fix: Separated express import from type imports to resolve type conflicts.
 import express from 'express';
 import type { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, Prisma, Item } = require('@prisma/client');
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
@@ -17,7 +16,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
             orderBy: { createdAt: 'desc' }
         });
         // FIXED: Return empty media array for now as media upload is not implemented.
-        res.json(items.map(item => ({...item, media: []}))); 
+        res.json(items.map((item: Item) => ({...item, media: []}))); 
     } catch (error) {
         res.status(500).json({ message: 'Error fetching items', error });
     }
@@ -100,7 +99,7 @@ router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Da
 
     try {
         let newHistory;
-        const updatedItem = await prisma.$transaction(async (tx) => {
+        const updatedItem = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             const item = await tx.item.update({
                 where: { id },
                 data: {

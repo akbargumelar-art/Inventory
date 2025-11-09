@@ -1,9 +1,8 @@
-
 // Fix: Separated express import from type imports to resolve type conflicts.
 import express from 'express';
 import type { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, Prisma, Item } = require('@prisma/client');
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
@@ -30,8 +29,8 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 
     try {
         let newHistory;
-        let updatedItem;
-        const newBorrowing = await prisma.$transaction(async (tx) => {
+        let updatedItem: Item | undefined;
+        const newBorrowing = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             // Decrease stock
             updatedItem = await tx.item.update({
                 where: { id: itemId },
@@ -67,7 +66,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 
             return borrowing;
         });
-        res.status(201).json({ newBorrowing, newHistory, updatedItem: {...updatedItem, media: []} });
+        res.status(201).json({ newBorrowing, newHistory, updatedItem: updatedItem ? {...updatedItem, media: []} : undefined });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error creating borrowing record', error: err.message });
@@ -85,8 +84,8 @@ router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Dat
 
     try {
         let newHistory;
-        let updatedItem;
-        const updatedBorrowing = await prisma.$transaction(async (tx) => {
+        let updatedItem: Item | undefined;
+        const updatedBorrowing = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             const borrowing = await tx.borrowing.findUnique({ where: { id } });
             if (!borrowing || borrowing.status === 'Kembali') {
                 throw new Error("Borrowing record not found or already returned.");
@@ -119,7 +118,7 @@ router.put('/:id/return', authMiddleware, authorize(['Administrator', 'Input Dat
                 },
             });
         });
-        res.json({ updatedBorrowing, newHistory, updatedItem: {...updatedItem, media: []} });
+        res.json({ updatedBorrowing, newHistory, updatedItem: updatedItem ? {...updatedItem, media: []} : undefined });
     } catch (error) {
         const err = error as Error;
         res.status(500).json({ message: 'Error returning item', error: err.message });

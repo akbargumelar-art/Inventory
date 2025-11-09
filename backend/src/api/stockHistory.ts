@@ -1,9 +1,8 @@
-
 // Fix: Separated express import from type imports to resolve type conflicts.
 import express from 'express';
 import type { Response } from 'express';
 // Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, StockHistory, User } = require('@prisma/client');
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
@@ -25,8 +24,13 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
             }
         });
         
+        type HistoryRecord = StockHistory & {
+            user: Partial<User>;
+            item: { id: string; name: string; sku: string; };
+        };
+
         // Map to frontend-compatible structure
-        const formattedHistory = history.map(h => ({
+        const formattedHistory = history.map((h: HistoryRecord) => ({
             id: h.id,
             timestamp: h.timestamp.toISOString(),
             user: h.user,
