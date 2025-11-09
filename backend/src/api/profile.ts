@@ -1,8 +1,7 @@
-// Fix: Separate default and type imports for express to resolve type conflicts.
+// Fix: Use standard imports for Express and Prisma to resolve type errors.
 import express from 'express';
-import type { Response } from 'express';
-// Fix: Use `require` for PrismaClient to avoid potential ESM/CJS module resolution issues.
-const { PrismaClient } = require('@prisma/client');
+import { Response } from 'express';
+import { PrismaClient } from '@prisma/client';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 

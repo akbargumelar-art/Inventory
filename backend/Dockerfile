@@ -22,6 +22,9 @@ RUN npm run build
 # Stage 2: Create the final production image
 FROM node:20-alpine
 
+# --- FINAL FIX: Install OpenSSL 1.1 compatibility library required by Prisma ---
+RUN apk add --no-cache openssl1.1-compat
+
 WORKDIR /usr/src/app
 
 # Copy package files
@@ -36,7 +39,7 @@ RUN npm install prisma
 # Copy the prisma schema
 COPY --from=builder /usr/src/app/prisma ./prisma
 
-# --- FINAL FIX: Generate Prisma Client AGAIN in the final stage ---
+# Generate Prisma Client AGAIN in the final stage
 # This ensures the correct binary engine is available for the production environment.
 RUN npx prisma generate
 

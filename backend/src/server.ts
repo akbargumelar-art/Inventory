@@ -1,6 +1,6 @@
-// Fix: Separate default and type imports for express to resolve type conflicts.
+// Fix: Changed type-only import of Express types to a regular import to resolve type conflicts.
 import express from 'express';
-import type { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './api/auth';
