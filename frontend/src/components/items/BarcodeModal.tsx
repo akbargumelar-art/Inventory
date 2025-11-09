@@ -19,7 +19,7 @@ const Code128Barcode: React.FC<{ value: string }> = ({ value }) => (
 );
 
 // Placeholder for QR code SVG
-const QRCode: React.FC = () => (
+const QRCode: React.FC<{ value: string }> = ({ value }) => (
   <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <rect x="0" y="0" width="100" height="100" fill="white" />
     <g fill="black">
@@ -107,7 +107,8 @@ const BarcodeModal: React.FC<BarcodeModalProps> = ({ isOpen, onClose, item }) =>
             </div>
             <div>
               <p className="text-center font-semibold flex items-center"><QrCodeIcon className="mr-2"/> QR Code</p>
-              <div className="p-2 bg-white rounded"><QRCode /></div>
+              {/* Fix: Pass item.sku to the QRCode component */}
+              <div className="p-2 bg-white rounded"><QRCode value={item.sku} /></div>
               <p className="text-center text-xs font-mono mt-1">{item.sku}</p>
             </div>
           </div>

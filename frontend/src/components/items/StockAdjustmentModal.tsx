@@ -15,6 +15,7 @@ const StockAdjustmentModal: React.FC<StockAdjustmentModalProps> = ({ isOpen, onC
   const [reason, setReason] = useState<StockHistory['type']>('Dijual');
 
   const reasonOptions: { [key in 'increase' | 'decrease']: StockHistory['type'][] } = {
+    // Fix: Add more reason options for adjustments
     increase: ['Penerimaan', 'Koreksi', 'Retur', 'Dikembalikan'],
     decrease: ['Dijual', 'Hilang', 'Diberikan', 'Koreksi', 'Penjualan', 'Dipinjamkan'],
   };

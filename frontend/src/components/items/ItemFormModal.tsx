@@ -77,34 +77,41 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Nama Barang</label>
+                {/* Fix: Ensure value is not undefined */}
                 <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Kategori</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <select name="categoryId" value={formData.categoryId || ''} onChange={handleChange} className={commonInputStyle}>
                   {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Lokasi Default</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <select name="defaultLocationId" value={formData.defaultLocationId || ''} onChange={handleChange} className={commonInputStyle}>
                   {locations.map(loc => <option key={loc.id} value={loc.id}>{loc.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Stok Saat Ini</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <input type="number" name="stock" value={formData.stock || 0} onChange={handleChange} className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Minimal Stok</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <input type="number" name="minStock" value={formData.minStock || 0} onChange={handleChange} className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Harga Perkiraan</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <input type="number" name="price" value={formData.price || 0} onChange={handleChange} className={commonInputStyle} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Satuan</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <select name="unit" value={formData.unit || 'pcs'} onChange={handleChange} className={commonInputStyle}>
                   <option value="pcs">Pcs</option>
                   <option value="kg">Kg</option>
@@ -114,6 +121,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
               </div>
                <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Status</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <select name="status" value={formData.status || 'Aktif'} onChange={handleChange} className={commonInputStyle}>
                   <option value="Aktif">Aktif</option>
                   <option value="Baik">Baik</option>
@@ -123,6 +131,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({ isOpen, onClose, onSave, 
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm text-gray-700">Deskripsi</label>
+                 {/* Fix: Ensure value is not undefined */}
                 <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={3} className={commonInputStyle}></textarea>
               </div>
                <div className="md:col-span-2">

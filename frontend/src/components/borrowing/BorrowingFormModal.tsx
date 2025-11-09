@@ -5,6 +5,7 @@ import { useData } from '../../hooks/useData';
 interface BorrowingFormModalProps {
   isOpen: boolean;
   onClose: () => void;
+  // Fix: Use Partial<Borrowing> to align with the data sent on save.
   onSave: (borrowing: Partial<Borrowing>) => void;
 }
 
@@ -72,6 +73,7 @@ const BorrowingFormModal: React.FC<BorrowingFormModalProps> = ({ isOpen, onClose
             </div>
              <div>
               <label className="block text-sm text-gray-700">Catatan</label>
+              {/* Fix: Ensure value is not undefined */}
               <textarea name="notes" value={formData.notes || ''} onChange={handleChange} rows={2} className={commonInputStyle}></textarea>
             </div>
           </div>

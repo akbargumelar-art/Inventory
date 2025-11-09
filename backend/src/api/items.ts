@@ -1,21 +1,21 @@
 // Fix: Use standard imports for Express and Prisma to resolve type errors.
-import express, { Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
-// Fix: Use `import type` for Prisma types to resolve module resolution issues.
-import type { Prisma, Item } from '@prisma/client';
+// Fix: Use `import` for Prisma types to resolve module resolution issues.
+import { Prisma, Item } from '@prisma/client';
 import { authMiddleware, AuthRequest, authorize } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all items - accessible by all authenticated users
-router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, async (req: AuthRequest, res: express.Response) => {
     try {
         const items = await prisma.item.findMany({ 
             // include: { media: true },
             orderBy: { createdAt: 'desc' }
         });
-        // FIXED: Return empty media array for now as media upload is not implemented.
+        // Return empty media array for now as media upload is not implemented.
         res.json(items.map((item: Item) => ({...item, media: []}))); 
     } catch (error) {
         res.status(500).json({ message: 'Error fetching items', error });
@@ -23,7 +23,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new item - Administrator & Input Data
-router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { ...itemData } = req.body;
     // active field is replaced by status
     delete itemData.active;
@@ -48,7 +48,7 @@ router.post('/', authMiddleware, authorize(['Administrator', 'Input Data']), asy
 });
 
 // PUT to update an item - Administrator & Input Data
-router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const { ...itemData } = req.body;
      // remove fields that shouldn't be updated directly
@@ -75,7 +75,7 @@ router.put('/:id', authMiddleware, authorize(['Administrator', 'Input Data']), a
 });
 
 // DELETE an item - Administrator only
-router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     try {
         // In a real app, you might need to handle related records first
@@ -88,7 +88,7 @@ router.delete('/:id', authMiddleware, authorize(['Administrator']), async (req: 
 });
 
 // POST to adjust stock - Administrator & Input Data
-router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: Response) => {
+router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Data']), async (req: AuthRequest, res: express.Response) => {
     const { id } = req.params;
     const { quantityChange, type, reason } = req.body;
     const userId = req.user?.userId;
@@ -99,7 +99,7 @@ router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Da
 
     try {
         let newHistory;
-        const updatedItem = await prisma.$transaction(async (tx: any) => {
+        const updatedItem = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             const item = await tx.item.update({
                 where: { id },
                 data: {
@@ -123,7 +123,7 @@ router.post('/:id/adjust', authMiddleware, authorize(['Administrator', 'Input Da
             return item;
         });
 
-        // FIXED: Return both the updated item and the new history record.
+        // Return both the updated item and the new history record.
         res.json({ updatedItem: {...updatedItem, media: []}, newHistory });
     } catch (error) {
         const err = error as Error;

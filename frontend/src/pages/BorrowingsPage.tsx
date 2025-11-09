@@ -31,6 +31,7 @@ const BorrowingsPage: React.FC = () => {
         }
     };
 
+    // Fix: Changed parameter type to Partial<Borrowing> to match what's passed from the form.
     const handleSave = (borrowing: Partial<Borrowing>) => {
         addBorrowing(borrowing);
         toast.success('Data peminjaman baru berhasil ditambahkan.');

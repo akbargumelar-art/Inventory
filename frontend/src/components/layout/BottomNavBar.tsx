@@ -41,6 +41,7 @@ const BottomNavBar: React.FC = () => {
         </NavLink>
     );
     
+    // Fix: Add role check for displaying the add button
     const canEdit = user?.role === 'Administrator' || user?.role === 'Input Data';
 
     return (

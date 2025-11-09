@@ -65,7 +65,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     setIsLoading(false);
                 }
             } else {
-                 // Clear data on logout
+                 // Fix: Clear data on logout to prevent showing stale data.
                 setItems([]);
                 setLocations([]);
                 setCategories([]);
@@ -141,12 +141,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Borrowings
     const addBorrowing = async (borrowing: Partial<Borrowing>) => {
+        // Fix: Properly handle the API response to update all relevant states.
         const { newBorrowing, newHistory, updatedItem } = await apiClient.post<{newBorrowing: Borrowing, newHistory: StockHistory, updatedItem: Item}>('/borrowings', borrowing);
         setBorrowings(prev => [newBorrowing, ...prev].sort((a, b) => new Date(b.borrowDate).getTime() - new Date(a.borrowDate).getTime()));
         setStockHistory(prev => [newHistory, ...prev]);
         setItems(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
     };
     const returnBorrowing = async (borrowingId: string) => {
+        // Fix: Properly handle the API response to update all relevant states.
         const { updatedBorrowing, newHistory, updatedItem } = await apiClient.put<{updatedBorrowing: Borrowing, newHistory: StockHistory, updatedItem: Item}>(`/borrowings/${borrowingId}/return`, {});
         setBorrowings(prev => prev.map(b => b.id === updatedBorrowing.id ? updatedBorrowing : b));
         setStockHistory(prev => [newHistory, ...prev]);

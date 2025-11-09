@@ -1,4 +1,3 @@
-
 // Fix: Use `require` to conform to the CommonJS module system used by the project.
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
